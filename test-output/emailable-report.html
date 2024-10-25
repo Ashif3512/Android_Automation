@@ -9,15 +9,18 @@
 <table>
 <tr><th>Test</th><th># Passed</th><th># Skipped</th><th># Retried</th><th># Failed</th><th>Time (ms)</th><th>Included Groups</th><th>Excluded Groups</th></tr>
 <tr><th colspan="8">Default suite</th></tr>
-<tr><td><a href="#t0">Default test</a></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num attn">1</td><td class="num">44,752</td><td></td><td></td></tr>
+<tr><td><a href="#t0">Default test</a></td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num attn">1</td><td class="num">71,780</td><td></td><td></td></tr>
 </table>
-<table id='summary'><thead><tr><th>Class</th><th>Method</th><th>Start</th><th>Time (ms)</th></tr></thead><tbody><tr><th colspan="4">Default suite</th></tr></tbody><tbody id="t0"><tr><th colspan="4">Default test &#8212; failed</th></tr><tr class="failedeven"><td rowspan="1">schedular.TC02_Schedular</td><td><a href="#m0">schedule</a></td><td rowspan="1">1727526554817</td><td rowspan="1">40651</td></tr></tbody>
+<table id='summary'><thead><tr><th>Class</th><th>Method</th><th>Start</th><th>Time (ms)</th></tr></thead><tbody><tr><th colspan="4">Default suite</th></tr></tbody><tbody id="t0"><tr><th colspan="4">Default test &#8212; failed</th></tr><tr class="failedeven"><td rowspan="1">testcases_pairing.TC01_Pairing_BlewithoutRouter</td><td><a href="#m0">removerepair</a></td><td rowspan="1">1729791025218</td><td rowspan="1">52970</td></tr></tbody>
 </table>
-<h2>Default test</h2><h3 id="m0">schedular.TC02_Schedular#schedule</h3><table class="result"><tr><th>Exception</th></tr><tr><td><div class="stacktrace">java.lang.RuntimeException: FAILED
+<h2>Default test</h2><h3 id="m0">testcases_pairing.TC01_Pairing_BlewithoutRouter#removerepair</h3><table class="result"><tr><th>Exception</th></tr><tr><td><div class="stacktrace">java.lang.RuntimeException: FAILED
 	at utils.Reporter.reportStep(Reporter.java:46)
-	at wrappers.GenericWrappers.clickbyXpath(GenericWrappers.java:175)
-	at pages.Schedularpage.createschedule(Schedularpage.java:224)
-	at schedular.TC02_Schedular.schedule(TC02_Schedular.java:49)
+	at wrappers.GenericWrappers.clickbyXpath(GenericWrappers.java:177)
+	at pages.HomePage.clickMenuBarButton(HomePage.java:41)
+	at pages.AddDevicePage.proceedToAddDevice(AddDevicePage.java:973)
+	at pages.AddDevicePage.initiatepairing(AddDevicePage.java:609)
+	at pages.AddDevicePage.pair(AddDevicePage.java:552)
+	at testcases_pairing.TC01_Pairing_BlewithoutRouter.removerepair(TC01_Pairing_BlewithoutRouter.java:44)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
 	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
 	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)

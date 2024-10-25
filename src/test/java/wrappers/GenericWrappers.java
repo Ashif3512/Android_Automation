@@ -4,24 +4,17 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.openqa.selenium.NoSuchElementException;
@@ -29,22 +22,29 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
+import io.appium.java_client.appmanagement.ApplicationState;
+import io.appium.java_client.Setting;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
+
 import utils.Reporter;
+import utils.logReadandWrite;
 
 public class GenericWrappers {
-
+ 
+	
+	
 	public static AndroidDriver<AndroidElement> driver;
-	public static WebDriverWait wait;
+	public WebDriverWait wait;
 	static ExtentTest test;
 	static ExtentReports report;
 	public String sUrl, primaryWindowHandle, sHubUrl, sHubPort;
 
+	
 	public Properties loadProp() {
 		Properties prop = new Properties();
 		try {
@@ -61,7 +61,7 @@ public class GenericWrappers {
 	}
 
 	public static boolean initAndriodDriver() throws FileNotFoundException, IOException {
-
+logReadandWrite log = new logReadandWrite("COM4");
 		boolean bReturn = false;
 		Properties prop = new Properties();
 		try {
@@ -73,16 +73,19 @@ public class GenericWrappers {
 			caps.setCapability("appium:platformVersion", prop.getProperty("PLATFORM_VERSION"));
 			caps.setCapability("appium:udid", prop.getProperty("UDID"));
 			caps.setCapability("appium:deviceName", prop.getProperty("DEVICE_NAME"));
-//			caps.setCapability("appium:appPackage", prop.getProperty("APP_PACKAGE"));
-//			caps.setCapability("appium:appActivity", prop.getProperty("APP_ACTIVITY"));
+
+			//			caps.setCapability("appium:appPackage", prop.getProperty("APP_PACKAGE"));
+			//			caps.setCapability("appium:appActivity", prop.getProperty("APP_ACTIVITY"));
 			caps.setCapability("appium:automationName", "uiautomator2");
 			caps.setCapability("newCommandTimeout", 999999);
-//			caps.setCapability("autoGrantPermissions", true);
+			//			caps.setCapability("autoGrantPermissions", true);
+//			caps.setCapability("enforceXPath1", true);
+//			driver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 10000);
+			driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723"), caps);
+//						keepSessionAlive(driver);
 
-			driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723/"), caps);
-//			keepSessionAlive(driver);
 			bReturn = true;
-
+			
 			String appPackage = prop.getProperty("APP_PACKAGE");
 			if (driver.isAppInstalled(appPackage)) {
 				System.out.println("App is already installed. Launching the app...");
@@ -90,53 +93,52 @@ public class GenericWrappers {
 			} else {
 				System.out.println("App is not installed. Installing and launching...");
 				driver.installApp(
-						"C:\\Users\\Invcuser_45\\Desktop\\Ashif\\Automation_Ashif\\Android_SZephyr_12888_stg.apk");
+						"C:\\Users\\Invcuser_45\\Desktop\\Ashif\\Automation_Ashif\\Android_SZephyr_13309_stg.apk");
 				driver.activateApp(appPackage); // Launch the app after installation
 			}
 
 		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
 			System.out.println("URL is malformed: " + e.getMessage());
 			e.printStackTrace();
 		}
 		return bReturn;
 	}
 
-//	public boolean invokeApp(String browser,String url) {
-//		boolean bReturn = false;
-//		try {
-//
-//			DesiredCapabilities dc = new DesiredCapabilities();
-//			dc.setBrowserName(browser);
-//			dc.setPlatform(Platform.WINDOWS);
-//			if(browser.equalsIgnoreCase("chrome")){
-//				WebDriverManager.chromedriver().setup();
-//				webDriver = new ChromeDriver();
-//				
-//			} else if(browser.equalsIgnoreCase("Edge")){
-//				WebDriverManager.edgedriver();
-//				webDriver = new EdgeDriver();
-//				
-//			} else if(browser.equalsIgnoreCase("Firefox")) {
-//				WebDriverManager.firefoxdriver();
-//				webDriver = new FirefoxDriver();
-//			}
-//
-//			webDriver.manage().window().maximize();
-//			webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-//			webDriver.get(url);
-//
-//			primaryWindowHandle = driver.getWindowHandle();
-//			
-//			Reporter.reportStep("The URL : "+ url + " launched successfully in"+ browser + " browser " , "PASS");
-//			bReturn = true;
-//
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//			Reporter.reportStep("The browser:" + browser + " could not be launched", "FAIL");
-//		}
-//		return bReturn;
-//	}
+	//	public boolean invokeApp(String browser,String url) {
+	//		boolean bReturn = false;
+	//		try {
+	//
+	//			DesiredCapabilities dc = new DesiredCapabilities();
+	//			dc.setBrowserName(browser);
+	//			dc.setPlatform(Platform.WINDOWS);
+	//			if(browser.equalsIgnoreCase("chrome")){
+	//				WebDriverManager.chromedriver().setup();
+	//				webDriver = new ChromeDriver();
+	//				
+	//			} else if(browser.equalsIgnoreCase("Edge")){
+	//				WebDriverManager.edgedriver();
+	//				webDriver = new EdgeDriver();
+	//				
+	//			} else if(browser.equalsIgnoreCase("Firefox")) {
+	//				WebDriverManager.firefoxdriver();
+	//				webDriver = new FirefoxDriver();
+	//			}
+	//
+	//			webDriver.manage().window().maximize();
+	//			webDriver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+	//			webDriver.get(url);
+	//
+	//			primaryWindowHandle = driver.getWindowHandle();
+	//			
+	//			Reporter.reportStep("The URL : "+ url + " launched successfully in"+ browser + " browser " , "PASS");
+	//			bReturn = true;
+	//
+	//		} catch (Exception e) {
+	//			e.printStackTrace();
+	//			Reporter.reportStep("The browser:" + browser + " could not be launched", "FAIL");
+	//		}
+	//		return bReturn;
+	//	}
 
 	public static void keepSessionAlive(AndroidDriver<AndroidElement> driver) {
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
@@ -292,7 +294,8 @@ public class GenericWrappers {
 		return bReturn;
 	}
 
-	public void quitBrowser() {
+
+	public static void quitBrowser() {
 		try {
 			if (driver != null) {
 				driver.quit();
@@ -305,17 +308,21 @@ public class GenericWrappers {
 
 	public static void expWait(WebElement xpath) {
 		try {
-//			WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(5));
+
+			WebDriverWait wait = new WebDriverWait(driver,15);
 			wait.until(ExpectedConditions.visibilityOf(xpath));
 		} catch (Exception e) {
 			System.out.println(e);
+
+
+
 		}
 
 	}
 
 	public void expWaitforPairing(WebElement xpath) {
 		try {
-//		WebDriverWait wait = new WebDriverWait(driver,Duration.ofSeconds(100));
+			WebDriverWait wait = new WebDriverWait(driver,100);
 			wait.until(ExpectedConditions.visibilityOf(xpath));
 		} catch (Exception e) {
 			System.out.println(e);
@@ -323,32 +330,9 @@ public class GenericWrappers {
 
 	}
 
-	public void runPythonScript() {
-		try {
-			// Update the path to the Python interpreter and the Python script
-			ProcessBuilder processBuilder = new ProcessBuilder("C:/Python312/python.exe",
-					"C:/Users/Invcuser_106/Desktop/Python code/serialport.py");
-			// Start the process
-			Process process = processBuilder.start();
 
-			// Capture the script output (stdout)
-			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-			String line;
-			System.out.println("Output of the Python script:");
-			while ((line = reader.readLine()) != null) {
-				System.out.println(line);
-			}
 
-			// Wait for the process to complete
-			int exitCode = process.waitFor();
-			System.out.println("Python script exited with code: " + exitCode);
-
-		} catch (IOException | InterruptedException e) {
-			e.printStackTrace();
-		}
-	}
-
-//	========================================
+	//	========================================
 
 	public int extractintvalue(String str) {
 		// Use regular expression to remove all non-digit characters
@@ -357,7 +341,7 @@ public class GenericWrappers {
 		// Convert the extracted string to an integer (optional)
 		int extractedValue = Integer.parseInt(numbersOnly);
 
-//          System.out.println("Extracted numbers: " + numbersOnly);
+		//          System.out.println("Extracted numbers: " + numbersOnly);
 		System.out.println("Extracted integer value: " + extractedValue);
 		return extractedValue;
 	}
@@ -414,24 +398,10 @@ public class GenericWrappers {
 		return bReturn;
 	}
 
-	public boolean isElementDisplayed(WebElement element) {
 
-		try {
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return element.isDisplayed();
-		} catch (NoSuchElementException e) {
-			return false;
-		}
-	}
 
-}
 
-class FTPUploader {
+
 
 	private FTPClient ftpClient;
 	private String randomDirName;
@@ -439,39 +409,39 @@ class FTPUploader {
 	String server2="ftp.iinvsys.com";
 	int port2=2121;
 	// Constructor to connect and login to FTP server
-	public FTPUploader(String server, int port, String user, String pass) throws IOException {
-		
-		 ftpClient = new FTPClient();
-	        if (!pingServer(server)) {
-	            System.out.println(server + " is not reachable. Trying " + server2);
-	            connectToServer(server2, port2, user, pass);
-	        } else {
-	            connectToServer(server, port, user, pass);
-	        }
-	    
+	public void FTPUploader(String server, int port, String user, String pass) throws IOException {
 
-	      
+		ftpClient = new FTPClient();
+		if (!pingServer(server)) {
+			System.out.println(server + " is not reachable. Trying " + server2);
+			connectToServer(server2, port2, user, pass);
+		} else {
+			connectToServer(server, port, user, pass);
+		}
+
+
+
 	}
 
-	  private void connectToServer(String server, int port, String user, String pass) throws IOException {
-          ftpClient.connect(server, port);
-          boolean login = ftpClient.login(user, pass);
-          
-          if (!login) {
-              throw new IOException("FTP login failed for server: " + server);
-          }
+	private void connectToServer(String server, int port, String user, String pass) throws IOException {
+		ftpClient.connect(server, port);
+		boolean login = ftpClient.login(user, pass);
 
-	ftpClient.enterLocalPassiveMode(); // Set passive mode for FTP
-	ftpClient.setFileType(FTP.BINARY_FILE_TYPE); // Use binary file type
-}
-	        private boolean pingServer(String server) {
-	            try {
-	                InetAddress address = InetAddress.getByName(server);
-	                return address.isReachable(2000); // Timeout after 2000 ms
-	            } catch (IOException e) {
-	                return false; // If there's an exception, the server is not reachable
-	            }
-	        }
+		if (!login) {
+			throw new IOException("FTP login failed for server: " + server);
+		}
+
+		ftpClient.enterLocalPassiveMode(); // Set passive mode for FTP
+		ftpClient.setFileType(FTP.BINARY_FILE_TYPE); // Use binary file type
+	}
+	private boolean pingServer(String server) {
+		try {
+			InetAddress address = InetAddress.getByName(server);
+			return address.isReachable(2000); // Timeout after 2000 ms
+		} catch (IOException e) {
+			return false; // If there's an exception, the server is not reachable
+		}
+	}
 	// Method to create a subdirectory and change the working directory to it
 	public void createAndNavigateToSubdirectory(String existingDirectory, String newSubDir) throws IOException {
 		// Navigate to the existing directory
@@ -515,7 +485,197 @@ class FTPUploader {
 			ftpClient.disconnect();
 		}
 
-	 }
-	
+	}
 
+
+
+
+	public void killAndReopenApp() {
+		try {
+			if (driver != null) {
+				// Kill the app (terminate it)
+				driver.terminateApp("com.iinvsys.szephyr");
+				Reporter.reportStep("The app was killed successfully.", "PASS");
+
+				// Wait for a few seconds before reopening the app
+				Thread.sleep(3000);
+
+				// Reopen the app, it should maintain its previous state (same page)
+				driver.activateApp("com.iinvsys.szephyr");
+				Reporter.reportStep("The app was reopened successfully.", "PASS");
+			}
+		} catch (Exception e) {
+			Reporter.reportStep("The app could not be killed and reopened.", "FAIL");
+		}
+	}
+
+
+	public static void expWaitforFirmware(WebElement xpath) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,300);
+			wait.until(ExpectedConditions.visibilityOf(xpath));
+		}
+		catch(Exception e) {
+			System.out.println(e); 
+		}
+
+	}
+	public static void expWaitstatusbar(WebElement xpath) {
+		try {
+			WebDriverWait wait = new WebDriverWait(driver,300);
+			wait.until(ExpectedConditions.visibilityOf(xpath));
+		}
+		catch(Exception e) {
+			System.out.println(e); 
+		}
+	}
+
+
+
+
+
+	public void enableWiFi() {
+
+		try {
+			//Runtime.getRuntime().exec("adb shell svc bluetooth disable");
+			Runtime.getRuntime().exec("adb shell svc wifi enable");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	public void disableWiFi() {
+
+		try {
+			//Runtime.getRuntime().exec("adb shell svc bluetooth disable");
+			Runtime.getRuntime().exec("adb shell svc wifi disable");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+	public void switchToSpecificWifiUsingCommand() {
+		try {
+			String command = "nmcli dev wifi connect 'realme6' password '12345222'";
+			Process process = Runtime.getRuntime().exec(command);
+			process.waitFor();
+			System.out.println("Switched to Wi-Fi network: YourWiFiSSID");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
+
+	@SuppressWarnings("deprecation")
+	public void connectToWiFi(String wifiName, String wifiPassword) {
+		try {
+			// Open WiFi settings on the Android device
+			Runtime.getRuntime().exec("adb shell svc wifi enable");
+			Runtime.getRuntime().exec("adb shell am start -a android.settings.WIFI_SETTINGS");
+			// Wait for the WiFi settings to open
+			Thread.sleep(5000);
+
+			// Scroll to the WiFi network by name
+			WebElement wifiElement = driver.findElement(MobileBy.AndroidUIAutomator(
+					"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""
+							+ wifiName + "\"))"));
+
+
+			// Click on the WiFi network
+			clickByXpath(wifiElement, "Clicked on " + wifiName + " on Wi-Fi page");
+
+		
+			// Check if the password entry field is displayed
+			WebElement enterPasswordField = driver.findElement(MobileBy.xpath("//android.widget.EditText[@resource-id=\"com.android.settings:id/password\"]")); // Replace with the actual XPath
+			if (isElementDisplayed(enterPasswordField)) {
+				// Enter the WiFi password
+				enterValueByXpath(enterPasswordField, "Wi-Fi password", wifiPassword);
+
+				// Click on the connect button
+				WebElement connectButton = driver.findElement(MobileBy.xpath("//android.widget.Button[@resource-id='android:id/button1']")); // Replace with the actual XPath
+				clickByXpath(connectButton, "Connect button");
+
+				Thread.sleep(5000);
+
+			} else {
+				System.out.println("Already connected or password is saved.");
+			
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	// Helper method to check if the element is displayed
+	public boolean isElementDisplayed(WebElement element) {
+		try {
+			Thread.sleep(1000);  // Introduce a small delay before checking visibility
+			return element.isDisplayed();
+		} catch (NoSuchElementException | InterruptedException e) {
+			return false;
+		}
+	}
+
+	// Example methods for clicking and entering values (to be replaced with your actual implementations)
+	public void clickByXpath(WebElement element, String description) {
+		element.click();
+		System.out.println(description);
+	}
+
+	public void enterValueByXpath(WebElement element, String fieldName, String value) {
+		element.sendKeys(value);
+		System.out.println("Entered value in " + fieldName + ": " + value);
+	}
+
+	public static void runPythonScript() {
+		try {
+			// Update the path to the Python interpreter and the Python script
+			ProcessBuilder processBuilder = new ProcessBuilder("C:/Python312/python.exe", "C:/Users/Invcuser_106/Desktop/Python code/serialport.py");
+			// Start the process
+			Process process = processBuilder.start();
+
+			// Capture the script output (stdout)
+			BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String line;
+			System.out.println("Output of the Python script:");
+			while ((line = reader.readLine()) != null) {
+				System.out.println(line);
+			}
+
+			// Wait for the process to complete
+			int exitCode = process.waitFor();
+			System.out.println("Python script exited with code: " + exitCode);
+
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void killsession() {
+		try {
+			if (driver != null) {
+				// Kill the app (terminate it)
+				driver.terminateApp("com.iinvsys.szephyr");
+//				Reporter.reportStep("The app was killed successfully.", "PASS");
+			}
+		} catch (Exception e) {
+//			Reporter.reportStep("The app could not be killed and reopened.", "FAIL");
+		}
+
+	}
+	public void close() {
+		driver.terminateApp("com.iinvsys.szephyr");
+		driver.quit();
+	}
+	public void checkappinforeground() throws Exception {
+		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
+			Thread.sleep(3000);
+		}
+	}
 }

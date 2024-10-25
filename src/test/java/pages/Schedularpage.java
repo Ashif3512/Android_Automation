@@ -41,8 +41,8 @@ public class Schedularpage extends GenericWrappers {
 	public Schedularpage(AndroidDriver<AndroidElement> driver) {
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
-		this.wait = new WebDriverWait(driver, 30);
 		this.js = (JavascriptExecutor) driver;
+		this.wait=new WebDriverWait(driver, 30);
 	}
 
 	
@@ -54,107 +54,7 @@ public class Schedularpage extends GenericWrappers {
 	OtpPage otppage;
 	AddDevicePage adddevicepage;
 	DeviceMenuPage devicemenupage;
-
-	
-
-
-
-//			adddevicepage.startPairingButton();
-//			if (isElementDisplayed(alertpopup)) {
-//				BleOKpopup.click();
-//				Thread.sleep(2000);
-//				driver.navigate().back();
-//			} else {
-//				System.out.println("Ble is in ON state");
-//			}
-//			Thread.sleep(3000);
-//			adddevicepage.locationPopUpPermission();
-//			adddevicepage.nearByPermission();
-
-//			switch (mode) {
-//			case 1:
-//				turnOnBT();
-//				
-//				Thread.sleep(3000);
-//				if (isElementDisplayed(alertpopup)) {
-//					BleOKpopup.click();
-//					Thread.sleep(2000);
-//					driver.navigate().back();
-//					Thread.sleep(2000);
-//				} else {
-//					System.out.println("No alert pop ups displayed");
-//				}
-//
-//				adddevicepage.clickWifiCancelButton();
-//
-//				break;
-//			case 2:
-//				turnOnBT();
-//				Thread.sleep(3000);
-//				if (isElementDisplayed(alertpopup)) {
-//					BleOKpopup.click();
-//					Thread.sleep(2000);
-//					driver.navigate().back();
-//				} else {
-//					System.out.println("Alert pop-up not displayed");
-//				}
-//				adddevicepage.enterWiFiPassword("12345678908");
-//				adddevicepage.clickEnterButton();
-//				break;
-//
-//			case 3:
-//
-//				turnOffBT();
-//				
-//				if (isElementDisplayed(alertpopup)) {
-//					BleOKpopup.click();
-//					Thread.sleep(2000);
-//					driver.navigate().back();
-//				} else {
-//					System.out.println("Alert pop-up not displayed");
-//				}
-//				Thread.sleep(3000);
-//
-//				adddevicepage.enterWiFiPassword("12345678908");
-//				adddevicepage.clickEnterButton();
-//
-//				break;
-//				
-//			case 4:
-//				turnOffBT();
-//				Thread.sleep(1000*5*1);
-//				if (isElementDisplayed(alertpopup)) {
-//					BleOKpopup.click();
-//					Thread.sleep(2000);
-//					driver.navigate().back();
-//				} else {
-//					System.out.println("Alert pop-up not displayed");
-//				}
-//				
-//
-//				Thread.sleep(1000*30*1);
-//				
-//				adddevicepage.enterWiFiPassword("12345678908");
-//				adddevicepage.clickEnterButton();
-//				
-//				Thread.sleep(1000*81*1);
-//				
-//				if (isElementDisplayed(devicewifipop_up)) {
-//					clickbyXpath(devicewifipop_upOK, "click on Device wifi OK popup");
-//					
-//					driver.findElement(MobileBy.AndroidUIAutomator(
-//					    "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("+serialno+"));")).click(); 
-//					
-//				}
-//				
-//				break;
-//			default:
-//				System.out.println("Pairing not done");
-//				break;
-//			}
-
 			
-
 
 
 	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Home_Navigation\"]")
@@ -206,10 +106,7 @@ public class Schedularpage extends GenericWrappers {
 	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Edit_Schedule_Duration_Hours_Minutes\"]")
 	private WebElement duration;
 	
-//	@FindBy(xpath = "")
-//	private WebElement ;
-//	@FindBy(xpath = "")
-//	private WebElement ;
+
 
 	public void createschedule(int mode, int intervals, int gap) throws Exception {
 
@@ -219,8 +116,9 @@ public class Schedularpage extends GenericWrappers {
 		adddevicepage = new AddDevicePage(driver);
 		otppage = new OtpPage(driver);
 		
-		
 		adddevicepage.pair(mode);
+		adddevicepage.clickNextButtonsZephyrInfo();
+		adddevicepage.clickSubmitButtonDeviceSetting();
 		clickbyXpath(Schedulebutton, "schedulebutton");
 
 		// Generate schedule times
@@ -337,30 +235,7 @@ public class Schedularpage extends GenericWrappers {
 
 	}
 
-//			public void removedevice() {
-//				driver.findElement(By.xpath(BaseClass_Z.schedulepagebackbtn)).click();
-//				driver.findElement(By.xpath(BaseClass_Z.menubar)).click();
-//				element = driver.findElement(By.xpath(BaseClass_Z.devicesettings));
-//
-//				wait.until(ExpectedConditions.visibilityOf(element));
-//				element.click();
-//
-//				//	 	       element.findElement(By.xpath(".//android.widget.TextView[@text=='Device settings']")).click();
-//				//	 	       element.findElement(By.xpath(BaseClass_Z.devicesettingsafterpairing)).click();
-//
-//				driver.findElement(By.xpath(BaseClass_Z.resetdevice)).click();
-//				driver.findElement(By.xpath(BaseClass_Z.factoryresetyes)).click();
-//
-//				element = driver.findElement(By.xpath(BaseClass_Z.adddevicebtn));
-//				text = element.getText();
-//
-//				if (text.contentEquals("Add Device")) { 
-//					System.out.println("Add device page displayed");
-//				}
-//				else {
-//					System.out.println("Add device page not displayed");
-//				}     
-//			}
+
 
 	public void disableschedule(int min) throws Exception, IOException, InterruptedException {
 

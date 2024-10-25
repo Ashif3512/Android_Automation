@@ -3,18 +3,18 @@
 <suite name="Failed suite [Default suite]" guice-stage="DEVELOPMENT">
   <test thread-count="5" name="Default test(failed)">
     <classes>
-      <class name="schedular.TC02_Schedular">
+      <class name="testcases_pairing.TC01_Pairing_BlewithoutRouter">
         <methods>
           <include name="afterMethod"/>
           <include name="afterTest"/>
           <include name="afterSuite"/>
-          <include name="schedule"/>
           <include name="beforeTest"/>
-          <include name="startTestCase"/>
+          <include name="removerepair"/>
           <include name="beforeMethod"/>
+          <include name="startTestCase"/>
           <include name="beforeSuite"/>
         </methods>
-      </class> <!-- schedular.TC02_Schedular -->
+      </class> <!-- testcases_pairing.TC01_Pairing_BlewithoutRouter -->
     </classes>
   </test> <!-- Default test(failed) -->
 </suite> <!-- Failed suite [Default suite] -->

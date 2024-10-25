@@ -12,8 +12,11 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.DataProvider;
+
+import jssc.SerialPortException;
 import utils.DataInputProvider;
 import utils.Reporter;
+import utils.logReadandWrite;
 
 public class MobileAppWrappers extends GenericWrappers {
 	protected String browserName;
@@ -22,26 +25,25 @@ public class MobileAppWrappers extends GenericWrappers {
 	protected static String testDescription;
 	GenericWrappers genericwrappers;
 
+	
 	@BeforeSuite
 	public void beforeSuite() throws FileNotFoundException, IOException{
 		Reporter.startResult();
-		boolean driverInitialized = initAndriodDriver();
-		if (driverInitialized) {
-		 System.out.println("Mobile App lanched Succesfully"); } else {
-		 System.out.println("Issue in Launching Mobile App"); }
-		 
+
+
 	}
 
 	@BeforeTest
-	public void beforeTest(){
+	public void beforeTest() throws FileNotFoundException, IOException{
 
 	}
 
 	@BeforeMethod 
 	public void beforeMethod(){ 
-	Reporter.startTestCase();
-	//initDriver(); 
-	
+		Reporter.startTestCase();
+		//initDriver(); 
+		
+
 	}
 
 	@AfterSuite
@@ -49,49 +51,53 @@ public class MobileAppWrappers extends GenericWrappers {
 		Reporter.endResult();
 	}
 
-	
+
 	@AfterTest
 	public void afterTest() throws IOException{
-		
-        try {
-            // FTP server credentials
-		
-		 String server = "192.168.10.34";//192.168.10.34
-         int port = 21;
-         String user = "qa_usr";
-         String pass = "nw9f2hgo@123";
 
-         // Local log files
-         String appLogPath = "C://Users//Invcuser_45//Desktop//React-Log-20240924_182921.txt";
-         String deviceLogPath = "C://Users//Invcuser_45//Desktop//LiveLog//OLD//teraterm.log";
+		try {
+			// FTP server credentials
 
-         // FTP paths
-         String existingDirectory = "/users/Ashif/";
-         String newSubDir = "Applogs_" + randomnumbers(4); // Subdirectory name
+			String server = "192.168.10.34";//192.168.10.34
+			int port = 21;
+			String user = "qa_usr";
+			String pass = "nw9f2hgo@123";
 
-         // Initialize FTP connection
-         FTPUploader ftpUploader = new FTPUploader(server, port, user, pass);
+			// Local log files
+			String appLogPath = "./serial_log.txt";
+			String deviceLogPath = "./serial_log.txt";
 
-         // Create new subdirectory inside the existing directory
-         ftpUploader.createAndNavigateToSubdirectory(existingDirectory, newSubDir);
+			// FTP paths
+			String existingDirectory = "//Internal_Project//FULL_VALIDATION_PACKAGES_LOGS//LOGS//2024//Automation_Logs//";
+			String newSubDir = "logs_" + randomnumbers(6); // Subdirectory name
 
-         // Upload files to the new subdirectory
-         ftpUploader.uploadFile(appLogPath, "React-Log-20240924_182921.txt");
-         ftpUploader.uploadFile(deviceLogPath, "teraterm.log");
+			// Initialize FTP connection
+			FTPUploader(server, port, user, pass);
 
-         // Disconnect from FTP server
-         ftpUploader.disconnect();
+			// Create new subdirectory inside the existing directory
+			createAndNavigateToSubdirectory(existingDirectory, newSubDir);
 
-        	} catch (IOException e) {
-         e.printStackTrace();
-     
-        	}
+			// Upload files to the new subdirectory
+			uploadFile(appLogPath,  testCaseName+".txt");
+			uploadFile(deviceLogPath, testCaseName+".txt");
+
+			// Disconnect from FTP server
+			disconnect();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+
+		}
 	}
 
 	@AfterMethod
 	public void afterMethod(){
-		quitBrowser();
+//		quitBrowser();
+		driver.terminateApp("com.iinvsys.szephyr");
+//		driver.closeApp();
 		driver.quit();
+//		logReadandWrite readwrite=new logReadandWrite("COM4");
+//		readwrite.closePort();
 	}
 
 	@DataProvider(name="fetchData")

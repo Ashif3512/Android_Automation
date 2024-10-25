@@ -2,7 +2,10 @@ package pages;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.testng.annotations.Test;
+
 import io.appium.java_client.android.AndroidDriver;
+import io.appium.java_client.appmanagement.ApplicationState;
 import wrappers.GenericWrappers;
 
 public class HomePage extends GenericWrappers{
@@ -14,12 +17,23 @@ public class HomePage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.TextView[@text=\"\"]")
 	private WebElement menuBarButton;
 	
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_accounts, com.szephyr:id/menu_text_accounts\"]")
+	private WebElement Accountinfobutton;
+	
+	
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_sharelog, com.szephyr:id/menu_text_sharelog\"]")
+	private WebElement sharelog ;
+	
+	@FindBy(xpath = "//android.widget.TextView[@text=\"sZephyr and AC turned ON\"]")
+	private WebElement Acturnondesc;
+	
 	public HomePage(AndroidDriver driver) {
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 	}
 	
 	public void clickONOFFButton() {
+		expWaitforPairing(deviceONOFFButton);
 		clickbyXpath(deviceONOFFButton, " Device ON OFF Button ");
 	}
 	
@@ -27,7 +41,52 @@ public class HomePage extends GenericWrappers{
 		clickbyXpath(menuBarButton, " Menu Bar ");
 	}
 	
+	public void clickAccountinfobutton() {
+		clickbyXpath(Accountinfobutton, " Account info");
+	}
 	
+
+	 public void clicksharcelog() {
+		expWaitforPairing(sharelog);
+		clickbyXpath(sharelog, " sharelog button ");
+	 }
+	 
+	 public void VerifyONdesc()
+	 {
+	  verifyTextContainsByXpath(Acturnondesc, "sZephyr and AC turned ON","Home Page");
+	 }
+	   public void killandopen() 
+	   {
+		   killAndReopenApp();
+	   }
 	
+	   public void disableBLE() throws Exception 
+	   {
+		   turnOffBT();
+	   }
+	   public void enableBLE() 
+	   {
+		   turnOnBT();
+	   }
+	   public void enableWIFI() 
+	   {
+		   enableWiFi();
+	   }
+	   public void disableWIFI() 
+	   {
+		   disableWiFi();
+	   }
+	   
+	   public void WifiSwitch(String Wifiname,String Wifipassword) throws Exception 
+	   {
+		   
+		   connectToWiFi(Wifiname, Wifipassword);
+			Runtime.getRuntime().exec("adb shell am force-stop com.android.settings");
+
+		   if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
+				driver.activateApp("com.iinvsys.szephyr"); // Bring it back
+				Thread.sleep(7000);
+			}
+	   }
 
 }
