@@ -1,18 +1,29 @@
 package pages;
 
+import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+
+import static org.testng.Assert.fail;
+
 import java.io.IOException;
+import java.time.Duration;
+
 import org.openqa.selenium.WebElement;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Properties;
+
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.python.core.exceptions;
+import org.testng.Assert;
+import org.testng.annotations.Parameters;
 
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.appmanagement.ApplicationState;
 import utils.PassSTComment;
 import utils.logReadandWrite;
@@ -20,45 +31,48 @@ import wrappers.GenericWrappers;
 
 public class AddDevicePage extends GenericWrappers {
 
-	public AndroidDriver<AndroidElement> driver;
+	public AndroidDriver driver;
 
-	public String userName=loadProp().getProperty("USERNAME"); 
-	public String emaId=loadProp().getProperty("EMAILID"); 
-	public String wifiPassword= loadProp().getProperty("WIFI_PASSWORD"); 
 	
-	
+	public String userName = loadProp("USERNAME");
+	public String emaId = loadProp("EMAILID");
+	public String wifiPassword = loadProp("WIFIPASSWORD");
+	public String deviceDetailsUpdated = loadProp("deviceDetailsUpdated");
+	public String devicesettingsupdatesuccess = loadProp("deviceSettingsUpdateSuccess");
+	public String DeviceRemovedSuccessfully = loadProp("DeviceRemovedSuccessfully");
+	public String YourDeviceResetSuccessfully = loadProp("YourDeviceResetSuccessfully");
+	public String RouterAddedSuccessfully = loadProp("RouterAddedSuccessfully");
+
 	// Locate all elements on the page
 
 	@FindBy(xpath = "//*[@resource-id='Add_Devices_ButtonText']")
 	private WebElement addDeviceButton;
 
-	@FindBy(xpath = "//android.widget.CheckBox")
+	@FindBy(xpath = "//*[@resource-id='Pairing_mode_Checkbox']")
 	private WebElement checkBoxPairing;
 
-	@FindBy(xpath = "//android.widget.TextView[@text='Next']")
+	@FindBy(xpath = "//*[@resource-id='Pairing_mode_ButtonText']")
 	private WebElement nextButtonPairing;
 
-	@FindBy(xpath = "//android.widget.TextView[@text='Start Pairing']")
+	@FindBy(xpath = "//*[@resource-id='Start_Pairing_Button_Text']")
 	private WebElement startPairingButton;
 
-	@FindBy(xpath = "//android.widget.Button[@resource-id='com.android.permissioncontroller:id/permission_allow_foreground_only_button']")
+	@FindBy(xpath = "//*[@resource-id='com.android.permissioncontroller:id/permission_allow_foreground_only_button']")
 	private WebElement locationPopUp;
 
-	@FindBy(xpath = "//android.widget.Button[@resource-id='com.android.permissioncontroller:id/permission_allow_button']")
+	@FindBy(xpath = "//*[@resource-id='com.android.permissioncontroller:id/permission_allow_button']")
 	private WebElement nearByPermisson;
 
 	@FindBy(xpath = "//android.widget.EditText[@text='Enter Password']")
 	private WebElement enterPasswordField;
 
-
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_Cancel\"]")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Cancel\"]")
 	private WebElement cancelButton;
 
-
-	@FindBy(xpath = "//android.widget.TextView[@text='Enter']")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Submit\"]")
 	private WebElement enterButton;
 
-	@FindBy(xpath = "//*[@resource-id='Wifi_RouterPasswerd_Cancel']")
+	@FindBy(xpath = "//android.widget.TextView[@text='Cancel']")
 	private WebElement routerCancelButton;
 
 	@FindBy(xpath = "//android.widget.TextView[@text='Next']")
@@ -67,37 +81,48 @@ public class AddDevicePage extends GenericWrappers {
 	@FindBy(xpath = "//android.widget.TextView[@text='Submit']")
 	private WebElement submitBtn;
 
-	@FindBy(xpath =  "//android.view.ViewGroup[@content-desc=\", Select Brand\"]")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\", Select Brand\"]")
 	private WebElement ClickBrandName;
 
-	@FindBy(xpath =  "//android.widget.TextView[@text=\"Carrier\"]")
+	@FindBy(xpath = "//*[@resource-id='Add_Device_YourDevice']")
+	private WebElement afterpairDeviceName;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Carrier\"]")
 	private WebElement ClickSelectName;
 
-	@FindBy(xpath =  "//android.widget.EditText[@content-desc=\"com.szephyr:id/Add_Device_Ac_ModelName_Input\"]")
+	@FindBy(xpath = "//*[@resource-id='Add_Device_Ac_ModelName_Input']")
 	private WebElement enterAcModelName;
 
-	@FindBy(xpath =  "//android.widget.EditText[@content-desc=\"com.szephyr:id/Add_Device_Capacity_Input\"]")
+	@FindBy(xpath = "//*[@resource-id='Add_Device_Capacity_Input']")
 	private WebElement enterCapacity;
 
-	@FindBy(xpath =  "//android.widget.TextView[@text=\"Select room size\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Select room size\"]")
 	private WebElement ClickRoomSizeButton;
 
-	@FindBy(xpath =  "//android.widget.TextView[@text=\"Medium\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Medium\"]")
 	private WebElement SelectRoomSizeOption;
 
-	@FindBy(xpath = "//android.view.ViewGroup[@resource-id='Add_Device_Next_Button']")
+	@FindBy(xpath = "//*[@resource-id='Add_Device_Next_Button_Text']")
 	private WebElement sZephyrInfoNextButton;
 
-	@FindBy(xpath = "//android.view.ViewGroup[@resource-id='UserConfig_Submit_Button']")
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Submit_ButtonText']")
 	private WebElement deviceSettingSubmitButton;
+
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Skip_ButtonText']")
+	private WebElement deviceSettingSkipButton;
 
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
 	private WebElement connectbuttonWifipage;
-	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
+
+	@FindBy(xpath = "//android.widget.TextView[@resource-id=\"com.oplus.wirelesssettings:id/menu_save\"]")
+	private WebElement savebuttonWifipage;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
 	private WebElement devicewifipop_upOK;
-	@FindBy(xpath = "//android.widget.TextView[@resource-id=\"android:id/alertTitle\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Please Connect Manually\"]")
 	private WebElement devicewifipop_up;
-	@FindBy(xpath = "//android.widget.TextView[@text='Sign In']")
+
+	@FindBy(xpath = "//*[@resource-id='Launch_SignInText']")
 	private WebElement signInButton;
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"com.android.permissioncontroller:id/permission_allow_foreground_only_button\"]")
 	private WebElement locationpermissionpopup;
@@ -116,121 +141,157 @@ public class AddDevicePage extends GenericWrappers {
 
 	@FindBy(xpath = "//android.widget.Button[@resource-id='android:id/button1']")
 	private WebElement Blepopup_afterpairing;
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Retrying_header_line\"]")
+
+	@FindBy(xpath = "//*[@resource-id='Retrying_header_line']")
 	private WebElement Retrypagetext;
 
-
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Retrying_Retry_Button_Text\"]")
+	@FindBy(xpath = "//*[@resource-id='Retrying_Retry_Button_Text']")
 	private WebElement Retrypageretrybutton;
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Retrying_Cancel_Button_Text\"]")
-	private WebElement Retrypagecancelbutton;
-	//android.widget.Button[@resource-id="android:id/button1"]
 
-	@FindBy(xpath = "//android.widget.FrameLayout[@resource-id='android:id/content']/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[7]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.CircleView[1]")
+	@FindBy(xpath = "//*[@resource-id='Retrying_Cancel_Button_Text']")
+	private WebElement Retrypagecancelbutton;
+
+	@FindBy(xpath = "//*[@resource-id='home_main_on_off_swch']")
 	private WebElement deviceONOFFButton;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_Cancel_Text\"]")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Cancel\"]")
 	private WebElement ClickCancelButtonWifi;
-	
-	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"com.szephyr:id/Add_Device_YourDevice\"]")
+
+	@FindBy(xpath = "//*[@resource-id='Add_Device_YourDevice']")
 	private WebElement szephyrDeviceName;
-	
-	@FindBy(xpath ="//android.view.ViewGroup[@content-desc=\", Select Brand\"]")
+
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\", Select Brand\"]")
 	private WebElement ACBrandNameClick;
-	
-	
+
 	@FindBy(xpath = "//android.widget.TextView[@text=\"Carrier\"]")
 	private WebElement ACBrandNameCarrier;
-	
-	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"com.szephyr:id/Add_Device_Ac_ModelName_Input\"]")
+
+	@FindBy(xpath = "//*[@resource-id='Add_Device_Ac_ModelName_Input']")
 	private WebElement ACModelName;
-	
-	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"com.szephyr:id/Add_Device_Capacity_Input\"]")
+
+	@FindBy(xpath = "//*[@resource-id='Add_Device_Capacity_Input']")
 	private WebElement Capacity;
-	
+
 	@FindBy(xpath = "//android.widget.TextView[@text=\"Select room size\"]")
 	private WebElement RoomSizeselect;
-	
+
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Small\"]")
 	private WebElement RoomSizesmall;
-	
-	@FindBy(xpath = "//android.widget.Switch[@content-desc=\"com.szephyr:id/UserConfig_Switch3\"]")
+
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Switch3']")
 	private WebElement Ledquietmode;
-	
-	@FindBy(xpath = "//android.widget.Switch[@content-desc=\"com.szephyr:id/UserConfig_Switch4\"]")
+
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Switch4']")
 	private WebElement infinitepoweron;
-	
+
 	@FindBy(xpath = "(//android.widget.TextView[@text=\"\"])[1]")
-	private WebElement hoursplusbutton ;
-	
+	private WebElement hoursplusbutton;
+
 	@FindBy(xpath = "(//android.widget.TextView[@text=\"\"])[2]")
-	private WebElement minutesplusbutton ;
-	
+	private WebElement minutesplusbutton;
+
 	@FindBy(xpath = "(//android.widget.TextView[@text=\"\"])[2]")
-   	private WebElement minutesminusbutton ;
-	
-	@FindBy(xpath ="//android.widget.Button[@resource-id=\"android:id/button2\"]")
+	private WebElement minutesminusbutton;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement ClickCancelButtonBle;
-	
-	@FindBy(xpath ="//android.widget.Button[@resource-id=\"android:id/button1\"]")
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
 	private WebElement ClickOkButtonBLEpopUP;
-	
+
 	@FindBy(xpath = "//android.widget.FrameLayout[@resource-id='android:id/content']/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[1]/android.widget.FrameLayout/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup/android.view.ViewGroup[7]/com.horcrux.svg.SvgView/com.horcrux.svg.GroupView/com.horcrux.svg.CircleView[1]")
 	private WebElement enterpasswordwifipge1;
-	
-    @FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/DeviceSetting_DurationforON, com.szephyr:id/DeviceSetting_DurationforON_Icon\"]")
+
+	@FindBy(xpath = "//*[@resource-id='DeviceSetting_DurationforON']")
 	private WebElement durationforON;
-    
-    @FindBy(xpath = "//android.widget.EditText[@text=\"0\"]")
-   	private WebElement hourstextbox ;
-    
-    @FindBy(xpath = "//android.widget.EditText[@text=\"19\"]")
-   	private WebElement minutestextbox; 
-	
-    @FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/DurationForON_Ok_ButtonText\"]")
-   	private WebElement clickokdurationON; 
-  
-   	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
-   	private WebElement backbuttonDevicesettings; 
-	
-   	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
+
+	@FindBy(xpath = "//android.widget.EditText[@text=\"0\"]")
+	private WebElement hourstextbox;
+
+	@FindBy(xpath = "//android.widget.EditText[@text=\"19\"]")
+	private WebElement minutestextbox;
+
+	@FindBy(xpath = "//*[@resource-id='DurationForON_Ok_Button']")
+	private WebElement clickokdurationON;
+
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
+	private WebElement backbuttonDevicesettings;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
 	private WebElement blePermissionOkButton;
 
-  //android.widget.Button[@resource-id="android:id/button2"]
-  //android.widget.Button[@resource-id="android:id/button1"]
-	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button2\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement blePermissionCancelButton;
 
 	@FindBy(xpath = "//android.widget.EditText[@resource-id=\"com.android.settings:id/password\"]")
 	private WebElement enterpasswordwifipge;
 
-	@FindBy(xpath = "//android.widget.Button[@resource-id='android:id/button1']")
+	@FindBy(xpath = "//android.widget.EditText")
+	private WebElement enterpasswordwifipgehighversion;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
 	private WebElement BleOKpopup;
 
-	
-	@FindBy(xpath = "//android.widget.Button[@resource-id='android:id/button2']")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement BLEcancelpopup;
 
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_Cancel\"]")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Cancel\"]")
 	private WebElement wifiCancel;
-	
-	@FindBy(xpath = "//android.widget.TextView[@resource-id=\"android:id/alertTitle\"]")
-	private WebElement alertTitle;
-	
-	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
-	private WebElement alertok;
-	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/ExitPairing_Ok_Button\"]")
-	private WebElement exitPairingok_popup;
 
+	@FindBy(xpath = "//android.widget.TextView[@text=\"sZephyr device is offline\"]")
+	private WebElement deviceofflinealertTitle;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"ALERT\"]")
+	private WebElement buttonPressAlert;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+	private WebElement alertok;
+
+//	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+//	private WebElement exitPairingok_popup;
+
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Device details updated successfully!\"]")
+	private WebElement sZhephyrInfotoast;
+
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Device settings updated successfully!\"]")
+	private WebElement Devicesettingstoast;
+
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Device removed successfully\"]")
+	private WebElement deviceremovedtoast;
+
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Your device reset successfully\"]")
+	private WebElement deviceresettoast;
+
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Router added successfully\"]")
+	private WebElement routeraddedsuccessfullytoast;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"⚠️ Unregistered Device Detected\"]")
+	private WebElement unregisteredpopup;
+
+	@FindBy(xpath = "//android.widget.TextView[@text=\"\"]")
+	private WebElement menuBarButton;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_ble_0_blue']")
+	private WebElement bleConnectivity;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_ble_0_grey']")
+	private WebElement bleNonConnectivity;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_STA_0_blue']")
+	private WebElement staConnectivity;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_STA_0_grey']")
+	private WebElement staNonConnectivity;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_remote_0_blue']")
+	private WebElement remoteConnectivity;
+	@FindBy(xpath = "//*[@resource-id='PairedGeyser_Img_svg_remote_0_grey']")
+	private WebElement remoteNonConnectivity;
+	@FindBy(xpath = "//*[@resource-id='menu_icon_removeDevice']")
+	private WebElement removeDevice;
 
 	// Constructor to initialize the driver and instantiate elements using
 
-	public AddDevicePage(AndroidDriver<AndroidElement> driver) {
+	public AddDevicePage(AndroidDriver driver) {
 		this.driver = driver;
 		PageFactory.initElements(driver, this);
 		this.js = (JavascriptExecutor) driver;
-		this.wait=new WebDriverWait(driver, 30);
+		this.wait = new WebDriverWait(driver, 10);
 
 	}
 
@@ -254,20 +315,19 @@ public class AddDevicePage extends GenericWrappers {
 
 	public void startPairingButton() {
 		clickbyXpath(startPairingButton, " Start Pairing ");
-		}
+	}
 
 	public void locationPopUpPermission() throws InterruptedException {
-		if (isElementDisplayed(locationPopUp)) {
+		if (isElementDisplayedCheck(locationPopUp)) {
 			clickbyXpath(locationPopUp, "Location pop-up");
 		} else {
 			System.out.println("not asked for precise or approx location");
 
 		}
-		//		clickbyXpathwithoutReport(locationPopUp, " Location Permission pop up " );
 	}
 
 	public void nearByPermission() throws InterruptedException {
-		if (isElementDisplayed(nearByPermisson)) {
+		if (isElementDisplayedCheck(nearByPermisson)) {
 
 			clickbyXpathwithoutReport(nearByPermisson, " Near by devices Permission  ");
 		}
@@ -278,15 +338,14 @@ public class AddDevicePage extends GenericWrappers {
 	}
 
 	public void clickRouterCancelButton() {
-		clickbyXpathwithoutReport(routerCancelButton, " Add router Cancel button" );
+		clickbyXpathwithoutReport(routerCancelButton, " Add router Cancel button");
 	}
 
 	public void clickEnterButton() {
 
 		clickbyXpath(enterButton, " Enter Button  ");
-		
-	}
 
+	}
 
 	public void clickNextButton() {
 		clickbyXpath(nextButton, " Enter Button  ");
@@ -297,69 +356,64 @@ public class AddDevicePage extends GenericWrappers {
 	}
 
 	public void clickNextButtonsZephyrInfo() {
-		if (isElementDisplayed(sZephyrInfoNextButton)) {
+		if (isElementDisplayednext(sZephyrInfoNextButton, "sZephyr info Next button ")) {
 			clickbyXpath(sZephyrInfoNextButton, " Next Button ");
-		}else {
-			   driver.activateApp(loadProp().getProperty("APP_PACKAGE"));
-			   expWaitforPairing(sZephyrInfoNextButton);
-			   clickbyXpath(sZephyrInfoNextButton, " Next Button ");
+		} else {
+			driver.activateApp(loadProp("APP_PACKAGE"));
+			expWaitforPairing(sZephyrInfoNextButton);
+			clickbyXpath(sZephyrInfoNextButton, " Next Button ");
 
 		}
-		
+
 	}
-
-
 
 	public void ClickBrandName() {
 		expWaitforPairing(ClickBrandName);
-		clickbyXpath(ClickBrandName," Ac Brand Name ");
+		clickbyXpath(ClickBrandName, " Ac Brand Name ");
 	}
 
 	public void ClickSelectName() {
-		clickbyXpath(ClickSelectName," Select Brand Name ");
+		clickbyXpath(ClickSelectName, " Select Brand Name ");
 	}
 
 	public void enterAcModelName(String entermodelname) {
-		entervaluebyXpath(enterAcModelName," AC Model Name " ,entermodelname );
+		entervaluebyXpath(enterAcModelName, " AC Model Name ", entermodelname);
 	}
 
 	public void enterCapacity(String Capacity) {
-		entervaluebyXpath(enterCapacity," AC Model Name " ,Capacity );
+		entervaluebyXpath(enterCapacity, " AC Model Name ", Capacity);
 	}
 
 	public void ClickRoomSizeButton() {
-		clickbyXpath(ClickRoomSizeButton," Room Size ");
+		clickbyXpath(ClickRoomSizeButton, " Room Size ");
 	}
 
 	public void SelectRoomSizeOption() {
-		clickbyXpath(SelectRoomSizeOption," Select room size ");
+		clickbyXpath(SelectRoomSizeOption, " Select room size ");
 	}
-
 
 	public void ClickCancelButtonBle() throws Exception {
-		clickbyXpath(ClickCancelButtonBle," Cancel Button ");
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+
+		clickbyXpathwithoutReport(ClickCancelButtonBle, " Cancel Button ");
+
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
 	}
-
 
 	public void cancelButton() throws Exception {
 		expWaitforPairing(cancelButton);
-		clickbyXpathwithoutReport(cancelButton," Wifi cancel Button ");
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+		clickbyXpathwithoutReport(cancelButton, " Wifi cancel Button ");
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
-	}		
+	}
 
 	public void ClickOkButtonBLEpopUP() throws Exception {
 		expWaitforPairing(ClickOkButtonBLEpopUP);
-		clickbyXpathwithoutReport(ClickOkButtonBLEpopUP," Ok Ble Button ");	
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+		clickbyXpathwithoutReport(ClickOkButtonBLEpopUP, " Ok Ble Button ");
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
 	}
 
@@ -367,11 +421,9 @@ public class AddDevicePage extends GenericWrappers {
 		clickbyXpath(deviceSettingSubmitButton, " Next Button ");
 	}
 
-
 	public void clickBlePermissionCancelbutton() {
 		clickbyXpath(blePermissionCancelButton, " Ble Popup Cancel Button ");
 	}
-
 
 	public void clickBlePermissionOkbutton() {
 		expWaitforPairing(blePermissionOkButton);
@@ -423,113 +475,97 @@ public class AddDevicePage extends GenericWrappers {
 
 	}
 
-
 	public void clickWifiCancelButton() throws Exception {
 		wait.until(ExpectedConditions.visibilityOf(wifiCancel));
 		clickbyXpath(wifiCancel, "Wificancel button");
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
 	}
 
 	public void clickBleokbutton() throws Exception {
 		wait.until(ExpectedConditions.visibilityOf(BleOKpopup));
 		clickbyXpath(BleOKpopup, "Ble okbutton");
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
 	}
 
 	public void clickBleCancelbutton() throws Exception {
 		wait.until(ExpectedConditions.visibilityOf(BLEcancelpopup));
 		clickbyXpath(BLEcancelpopup, "Ble Cancelbutton");
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-			Thread.sleep(3000);
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 		}
 	}
 
-	
-public void aCBrandNameClick ()
-	
-	{	
+	public void aCBrandNameClick()
+
+	{
 		expWaitforPairing(ACBrandNameClick);
-		clickbyXpath( ACBrandNameClick,"Acbrandname");
+		clickbyXpath(ACBrandNameClick, "Acbrandname");
 	}
-    public void aCBrandNameCarrierclick()
-	
-	{	
+
+	public void aCBrandNameCarrierclick()
+
+	{
 		expWaitforPairing(ACBrandNameClick);
-		clickbyXpath( ACBrandNameCarrier,"Acbrandname");
+		clickbyXpath(ACBrandNameCarrier, "Acbrandname");
 	}
-	
-    public void roomSizeselect()
-    {
+
+	public void roomSizeselect() {
 		clickbyXpath(RoomSizeselect, " room Size ");
 	}
-    public void roomSizesmall() 
-    {
+
+	public void roomSizesmall() {
 		clickbyXpath(RoomSizesmall, "Select room size ");
 	}
-    
-    public void clickLedquietmode() 
-    {
+
+	public void clickLedquietmode() {
 		clickbyXpath(Ledquietmode, "LED enable disable ");
 	}
-    
-    public void Alertpopup() 
-    {
+
+	public void Alertpopup() {
 		clickbyXpath(alertpopup, "Inn_alertpopup");
 	}
-    public void LEDquietmode() 
-    {
+
+	public void LEDquietmode() {
 		clickbyXpath(Ledquietmode, "enabling LED Quiet mode");
 	}
-	
-    public void Infinitepoweron() 
-    {
+
+	public void Infinitepoweron() {
 		clickbyXpath(infinitepoweron, "Clicking INFINITE Power On disable");
 	}
-    
-    public void hoursplusbutton () 
-    {
-		clickbyXpath(hoursplusbutton , "Clicking Hours plus button set 0");
+
+	public void hoursplusbutton() {
+		clickbyXpath(hoursplusbutton, "Clicking Hours plus button set 0");
 	}
-    
-    public void Minutesminusbutton () 
-    {
-		clickbyXpath(minutesminusbutton , "Clicking Hours plus button set 0");
+
+	public void Minutesminusbutton() {
+		clickbyXpath(minutesminusbutton, "Clicking Hours plus button set 0");
 	}
-	
-    public void DurationforON () 
-    {
-		clickbyXpath(durationforON , "Clicking Duration for ON");
+
+	public void DurationforON() {
+		clickbyXpath(durationforON, "Clicking Duration for ON");
 	}
-    
-	public void Hourstextbox()
-	{	
-		verifyTextContainsByXpath(hourstextbox , "0", "Hours");
+
+	public void Hourstextbox() {
+		verifyTextContainsByXpath(hourstextbox, "0", "Hours");
 	}
-	
-	public void Minutestextbox()
-	{	
-		verifyTextContainsByXpath(minutestextbox , "19", "Minutes");
+
+	public void Minutestextbox() {
+		verifyTextContainsByXpath(minutestextbox, "19", "Minutes");
 	}
-	public void ClickokdurationON()
-	{
-		//wait.until(ExpectedConditions.visibilityOf(clickokdurationON));
+
+	public void ClickokdurationON() {
+		// wait.until(ExpectedConditions.visibilityOf(clickokdurationON));
 		clickbyXpath(clickokdurationON, "OKbutton_Duration for ON");
 	}
-	
-	 public void BackbuttonDevicesettings () 
-	    {
-			clickbyXpath(backbuttonDevicesettings , "back button click");
-		}
-	
-	
-	
+
+	public void BackbuttonDevicesettings() {
+		clickbyXpath(backbuttonDevicesettings, "back button click");
+	}
+
 	String serialno = "iinv_smartac";
 
 	LandingPage landingpage;
@@ -538,82 +574,79 @@ public void aCBrandNameClick ()
 	OtpPage otppage;
 	DeviceMenuPage devicemenupage;
 	PassSTComment passcommand;
-	
+
 	public void pair(int mode) throws Exception {
 		loginpage = new SignInPage(driver);
 		landingpage = new LandingPage(driver);
 		homepage = new HomePage(driver);
 		otppage = new OtpPage(driver);
-		devicemenupage= new DeviceMenuPage(driver);
-		passcommand=new PassSTComment();
-		
+		devicemenupage = new DeviceMenuPage(driver);
+		passcommand = new PassSTComment();
 		
 		verifysigninpage();
 		initiatepairing(mode);
 	}
 
+	@Parameters({ "os" })
 	public void verifysigninpage() throws Exception {
-		homepage.WifiSwitch(loadProp().getProperty("WIFINAME"), loadProp().getProperty("WIFIPASSWORD"));
-		if (isElementDisplayed(blePermissionOkButton)) {
-			clickByXpath(blePermissionOkButton, "Allowing Ble permission pop-up");
-			if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-				driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-				Thread.sleep(3000);
-			}
-		}
-		if (isElementDisplayed(signInButton)) {
 
-			landingpage.clickSignInButton();
-			loginpage.enterUserName(userName);
-			loginpage.clickSignInButton();
-			otppage.enterOTPField1("1");
-			otppage.enterOTPField2("2");
-			otppage.enterOTPField3("3");
-			otppage.enterOTPField4("4");
-			otppage.submitButton();
+		// Backgrounds app for 10 seconds
+		homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
 
-		} else {
-			System.out.println("App is already Installed and opening the previous state");
+		turnOnBT();
+		/*
+		 * if (isElementDisplayedCheck(blePermissionOkButton)) {
+		 * clickbyXpath(blePermissionOkButton, "Allowing Ble permission pop-up");
+		 * checkappinforeground(); }
+		 */	
+		
+		try {
+			Thread.sleep(5000);
+			if(isElementDisplayedCheck(signInButton)) {
+				landingpage.clickSignInButton();
+				loginpage.enterUserName(userName);
+				loginpage.clickSignInButton();
+				otppage.enterOTPField1("1");
+				otppage.enterOTPField2("2");
+				otppage.enterOTPField3("3");
+				otppage.enterOTPField4("4");
+				otppage.submitButton();
+
+			} 
+		} catch (NoSuchElementException e) {
+			// TODO Auto-generated catch block
+			System.out.println("App is already logged in and opening the previous state");
 		}
 	}
 
 	public void initiatepairing(int mode) throws Exception {
-		if (isElementDisplayed(locationpermissionpopup)) {
-			clickbyXpath(locationpermissionpopup, "Location pop-up");
 
-			// Check if device permission popup appears after location permission
-			if (isElementDisplayed(devicepermission)) {
-				clickbyXpath(devicepermission, "Device permission pop-up");
-			}
-			if (isElementDisplayed(blePermissionOkButton)) {
-				clickByXpath(blePermissionOkButton, "Allowing Ble permission pop-up");
-			}
-			if (isElementDisplayed(acturnoffdesc)) {
-				System.out.println("Device is already paired removing the device..");
-				homepage.clickMenuBarButton();
-				devicemenupage.clickMenuBarRemoveDevice();
-				devicemenupage.clickRemoveDevicePopupYesButton();
-				Thread.sleep(5000);
-				if (isElementDisplayed(alertTitle)) {
-					String text = alertTitle.getText();
-					System.out.println(text+ "  Alert pop-up displayed");
-					clickByXpath(alertok, "Alert ok button");
-					proceedToAddDevice(mode);
-					
-				}
-			}
+//		if (isElementDisplayedCheck(locationpermissionpopup)) {
+//			clickbyXpath(locationpermissionpopup, "Location pop-up");
+//
+//			// Check if device permission popup appears after location permission
+//			if (isElementDisplayedCheck(devicepermission)) {
+//				clickbyXpath(devicepermission, "Device permission pop-up");
+//			}
+		turnOnBT();
+		/*
+		 * if (isElementDisplayedCheck(blePermissionOkButton)) { clickbyXpath(blePermissionOkButton,
+		 * "Allowing Ble permission pop-up"); }
+		 */
 
-			// Proceed to add the device if no further permission popups
-		} else {
-			// No location permission popup, proceed to add the device
-			proceedToAddDevice(mode);
-		}
+//		}
+
+		proceedToAddDevice(mode);
 	}
 
-	//	mode=1-Ble without router ,2-Ble with router,3-Smartconfig,
+	// mode=1-Ble without router ,2-Ble with router,3-Smartconfig,4-wifi with
+	// roouter ,5 wifi without router
+	logReadandWrite readwrite = logReadandWrite.getInstance(loadProp("COM"));
 
 	public void proceedToAddDevice(int mode) throws Exception {
-		if (isElementDisplayed(addDeviceButton)) {
+		
+
+		if (isElementDisplayedCheck(addDeviceButton)) {
 
 			clickAddDeviceButton();
 			checkBoxPairing();
@@ -623,337 +656,145 @@ public void aCBrandNameClick ()
 			case 1:
 				turnOnBT();
 				startPairingButton();
-				if (isElementDisplayed(BleOKpopup)) {
-					BleOKpopup.click();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Ble is in ON state");
-				}
-				locationPopUpPermission();
-				nearByPermission();
+				readwrite.write("factory_reset\r");
+//				blepermissionokpopup();
+//				locationPopUpPermission();
+//				nearByPermission();
 
-				Thread.sleep(3000);
-				if (isElementDisplayed(BleOKpopup)) {
-					BleOKpopup.click();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}
-				} else {
-					System.out.println("No alert pop ups displayed");
-				}
-
+//				Thread.sleep(3000);
+//				blepermissionokpopup();
+          
 				clickWifiCancelButton();
-
-				if (isElementDisplayed(Retrypagetext)) {
-
-					clickbyXpath(Retrypageretrybutton, "retrypage");
-					
-					logReadandWrite readwrite=new logReadandWrite("COM4");
-					
-//					readwrite.openPort();
-//					readwrite.read();
-//					Thread.sleep(2000);
-					readwrite.write("factory_reset\r");
-					driver.navigate().back();
-					clickbyXpath(exitPairingok_popup, "clicking on exit pop-up ");
-					proceedToAddDevice(mode);
-				}else {
-					System.out.println("Retry page not displayed proceed to connect with wifi page");
+				Thread.sleep(30000);
+				
+				if(!isElementDisplayedCheck(sZephyrInfoNextButton)) {
+				retrypagecheck(mode);
+				unregistereddevicepopup();
 				}
 				break;
 
 			case 2:
-				homepage.WifiSwitch(loadProp().getProperty("WIFINAME"), loadProp().getProperty("WIFIPASSWORD"));
+				homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
 				turnOnBT();
 				startPairingButton();
-				if (isElementDisplayed(BleOKpopup)) {
-					BleOKpopup.click();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Ble is in ON state");
-				}
-				locationPopUpPermission();
-				nearByPermission();
-
-				if (isElementDisplayed(BleOKpopup)) {
-					BleOKpopup.click();
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}
-				} else {
-					System.out.println("Alert pop-up not displayed");
-				}
+//				blepermissionokpopup();
+//				locationPopUpPermission();
+//				nearByPermission();
+				readwrite.write("factory_reset\r");
+				blepermissionokpopup();
 				enterWiFiPassword(wifiPassword);
 				clickEnterButton();
-				if (isElementDisplayed(Retrypagetext)) {
-
-					clickbyXpath(Retrypageretrybutton, "retrypage");
-					
-					logReadandWrite readwrite=new logReadandWrite("COM4");
-					
-//					readwrite.openPort();
-//					readwrite.read();
-//					Thread.sleep(2000);
-					readwrite.write("factory_reset\r");
-					driver.navigate().back();
-					clickbyXpath(exitPairingok_popup, "clicking on exit pop-up ");
-					proceedToAddDevice(mode);
-				}else {
-					System.out.println("Retry page not displayed proceed to connect with wifi page");
+				Thread.sleep(30000);
+				if(!isElementDisplayedCheck(sZephyrInfoNextButton))  {
+				retrypagecheck(mode);
+				unregistereddevicepopup();
 				}
 				break;
+				
 			case 3:
-				homepage.WifiSwitch(loadProp().getProperty("WIFINAME"), loadProp().getProperty("WIFIPASSWORD"));
+				homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
+				readwrite.write("reboot\r");
 				turnOffBT();
 				startPairingButton();
-				if (isElementDisplayed(BleOKpopup)) {
+//				blepermissionokpopup();
+//				locationPopUpPermission();
+//				nearByPermission();
 
-					BLEcancelpopup.click();
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}
-				} else {
-					System.out.println("Ble is in ON state");
-				}
-//				Thread.sleep(3000);
-				locationPopUpPermission();
-				nearByPermission();
-
-				if (isElementDisplayed(blePermissionOkButton)) {
-
-					blePermissionCancelButton.click();
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}
-				} else {
-					System.out.println("Alert pop-up not displayed");
-				}
-
+				readwrite.write("factory_reset\r");
+				blepermissionokpopup();
+				Thread.sleep(5000);
 				enterWiFiPassword(wifiPassword);
 				clickEnterButton();
 				
-				Thread.sleep(1000*2*10);
 				
-				if (isElementDisplayed(BleOKpopup)) {
-					BleOKpopup.click();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Turn on Bluetooth for connectivity pop-up not displayed");
-				}
-				Thread.sleep(20000);
-				if (isElementDisplayed(Retrypagetext)) {
+				Thread.sleep(1000 * 1 * 10);
 
-					clickbyXpath(Retrypageretrybutton, "retrypage");
-					
-					logReadandWrite readwrite=new logReadandWrite("COM4");
-					
-//					readwrite.openPort();
-//					readwrite.read();
-//					Thread.sleep(2000);
-					readwrite.write("factory_reset\r");
-					driver.navigate().back();
-					clickbyXpath(exitPairingok_popup, "clicking on exit pop-up ");
-					proceedToAddDevice(mode);
-				}else {
-					System.out.println("Retry page not displayed proceed to connect with wifi page");
+				blepermissionokpopup();
+				
+				Thread.sleep(30000);
+				
+				if(!isElementDisplayedCheck(sZephyrInfoNextButton)) {
+					retrypagecheck(mode);
+					unregistereddevicepopup();
 				}
+				
 				break;
+				
 			case 4:
-				homepage.WifiSwitch(loadProp().getProperty("WIFINAME"), loadProp().getProperty("WIFIPASSWORD"));
+				homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
 				turnOffBT();
 				startPairingButton();
-				if (isElementDisplayed(BLEcancelpopup)) {
-					BLEcancelpopup.click();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Ble is in ON state");
-				}
-				Thread.sleep(3000);
-				locationPopUpPermission();
-				nearByPermission();
+				readwrite.write("factory_reset\r");
+				blepermissioncancelpopup();
+//				Thread.sleep(3000);
+//				locationPopUpPermission();
+//				nearByPermission();
 
 				Thread.sleep(1000 * 5 * 1);
-				if (isElementDisplayed(BLEcancelpopup)) {
-					BLEcancelpopup.click();
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Alert pop-up not displayed");
-				}
+				blepermissionokpopup();
 
-				Thread.sleep(1000 * 10 * 1);
+				Thread.sleep(1000 * 10 * 3);
 
 				enterWiFiPassword("12345678911");
 				clickEnterButton();
 
-				Thread.sleep(100000);
+				Thread.sleep(5*20*1000);
 				
-				if (isElementDisplayed(Retrypagetext)) {
-
-					clickbyXpath(Retrypageretrybutton, "retrypage");
-					
-					logReadandWrite readwrite=new logReadandWrite("COM4");
-					
-//					readwrite.openPort();
-//					readwrite.read();
-//					Thread.sleep(2000);
-					readwrite.write("factory_reset\r");
-					driver.navigate().back();
-					clickbyXpath(exitPairingok_popup, "clicking on exit pop-up ");
-					proceedToAddDevice(mode);
-				}else {
-					System.out.println("Retry page not displayed proceed to connect with wifi page");
+				if(!isElementDisplayedCheck(devicewifipop_upOK)) {
+					retrypagecheck(mode);
+					unregistereddevicepopup();
 				}
-				if (isElementDisplayed(devicewifipop_upOK)) {
-					clickbyXpath(devicewifipop_upOK, "click on Device wifi OK popup");
-
-
-							
-					Thread.sleep(5000);
-					AndroidElement element = driver.findElement(MobileBy.AndroidUIAutomator(
-							"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""
-									+ serialno + "\"))"));
-					wait.until(ExpectedConditions.visibilityOf(element));
-					wait.until(ExpectedConditions.elementToBeClickable(element));
-					element.click();
-					if (isElementDisplayed(enterpasswordwifipge)) {
-						entervaluebyXpath(enterpasswordwifipge, "wifipage password", "mypassword");
-						hidekeyboard();
-						clickbyXpath(connectbuttonWifipage, "connect button");
-					} else {
-						System.out.println("Already password saved ");
-					}
-
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						//						WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-						
-
-					}
-					if (isElementDisplayed(Blepopup_afterpairing)) {
-						
-						clickbyXpath(Blepopup_afterpairing, "oK button of Ble alert pop-up");
-					}
-
-					// Now click the OK button once it is visible and clickable
-
-
-					//					driver.navigate().back();
-
-				} else {
-					System.out.println("unable to connect with device hotspot");
+				connectwithmobilewifipage();
+				homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
+				
+				Runtime.getRuntime().exec("adb shell am force-stop com.android.settings");
+				if(isElementDisplayednext(devicewifipop_upOK,"Could not connect with router popup"))  {
+					
+					clickbyXpath(devicewifipop_upOK, "Cliked on not connected with router pop-up");
 				}
+				
 				break;
 
 			case 5:
-				homepage.WifiSwitch(loadProp().getProperty("WIFINAME"), loadProp().getProperty("WIFIPASSWORD"));
-				
+				homepage.WifiSwitch(loadProp("WIFINAME"), loadProp("WIFIPASSWORD"));
+
 				turnOffBT();
 
 				startPairingButton();
 
-				if (isElementDisplayed(BLEcancelpopup)) {
-					clickBleCancelbutton();
-					Thread.sleep(2000);
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Ble is in On state");
-				}
-				Thread.sleep(3000);
-				locationPopUpPermission();
-				nearByPermission();
+			    blepermissioncancelpopup();
+//				Thread.sleep(3000);
+//				locationPopUpPermission();
+//				nearByPermission();
 
-
-				Thread.sleep(1000 * 5 * 1);
-				if (isElementDisplayed(BLEcancelpopup)) {
-					clickBleCancelbutton();
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-						Thread.sleep(3000);
-					}				} else {
-					System.out.println("Alert pop-up not displayed");
-				}
+//				if (isElementDisplayedCheck(BLEcancelpopup)) {
+//					clickBleCancelbutton();
+//					if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+//						driver.activateApp(packages); // Bring it back
+//						Thread.sleep(3000);
+//					}
+//				} else {
+//					System.out.println("Alert pop-up not displayed");
+//				}
 
 				clickWifiCancelButton();
+				readwrite.write("factory_reset\r");
+				Thread.sleep(5*20*1000);
 
-
-				Thread.sleep(100000);
-
-				if (isElementDisplayed(Retrypagetext)) {
-
-					clickbyXpath(Retrypageretrybutton, "retrypage");
-					
-					driver.navigate().back();
-					clickbyXpath(exitPairingok_popup, "clicking on exit pop-up ");
-					proceedToAddDevice(mode);
-				}else {
-					System.out.println("Retry page not displayed proceed to connect with wifi page");
+				if(!isElementDisplayedCheck(devicewifipop_upOK))  {
+					retrypagecheck(mode);
+					unregistereddevicepopup();
 				}
-
-
-				if (isElementDisplayed(devicewifipop_upOK)) {
-					clickbyXpath(devicewifipop_upOK, "click on Device wifi OK popup");
-					
-					Thread.sleep(5000);
-					AndroidElement element = driver.findElement(MobileBy.AndroidUIAutomator(
-							"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""
-									+ serialno + "\"))"));
-					wait.until(ExpectedConditions.visibilityOf(element));
-					wait.until(ExpectedConditions.elementToBeClickable(element));
-					element.click();
-					if (isElementDisplayed(enterpasswordwifipge)) {
-						entervaluebyXpath(enterpasswordwifipge, "wifipage password", "mypassword");
-
-
-						hidekeyboard();
-						clickbyXpath(connectbuttonWifipage, "connect button");
-					} else {
-						System.out.println("Already password saved ");
-					}
-
-
-
-					
-				} else {
-					System.out.println("unable to connect with device hotspot");
-				}
+				connectwithmobilewifipage();
+				
 				Thread.sleep(5000);
 				Runtime.getRuntime().exec("adb shell am force-stop com.android.settings");
-				if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-					driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-					
+				if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+					driver.activateApp(packages); // Bring it back
+
 				}
 				Thread.sleep(5000);
-				
-				if (isElementDisplayed(Blepopup_afterpairing)) {
-					
-					clickbyXpath(Blepopup_afterpairing, "oK button of Ble alert pop-up");
-					if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-						driver.activateApp("com.iinvsys.szephyr"); // Bring it back
-					}
-				}else {
-					System.out.println("unable to click ok on BLE pop-up");
-				}
+				blepermissionokpopup();
 				turnOnBT();
 				break;
 
@@ -962,32 +803,128 @@ public void aCBrandNameClick ()
 				break;
 			}
 
-
 		} else {
-			
+
 			System.out.println("Device is already in paired state removing the device");
-			
-		
-			
-			
+
+			readwrite.write("factory_reset\r");
+
 			homepage.clickMenuBarButton();
 			devicemenupage.clickMenuBarRemoveDevice();
 			devicemenupage.clickRemoveDevicePopupYesButton();
-			Thread.sleep(5000);
-			if (isElementDisplayed(alertTitle)) {
-				String text = alertTitle.getText();
-				System.out.println(text+ "  Alert pop-up displayed");
-				clickByXpath(alertok, "Alert ok button");
+			Thread.sleep(2000);//or5000
+			if (isElementDisplayedCheck(deviceofflinealertTitle)) {
+				String text = deviceofflinealertTitle.getText();
+				System.out.println(text + "  Alert pop-up displayed");
+				clickbyXpath(alertok, "Alert ok button");
 				proceedToAddDevice(mode);
-				
-			}else {
-				
+
+			} else if (isElementDisplayedCheck(buttonPressAlert)) {
+				String text = buttonPressAlert.getText();
+				System.out.println(text + "  Alert pop-up displayed");
+				clickbyXpath(alertok, "Alert ok button");
+				proceedToAddDevice(mode);
+
+			} else {
+
 				proceedToAddDevice(mode);
 			}
 		}
 	}
 
+	
+	private void connectwithmobilewifipage() throws Exception {
+		if (isElementDisplayedCheck(devicewifipop_upOK)) {
+			clickbyXpath(devicewifipop_upOK, "click on Device wifi OK popup");
+			
+			Runtime.getRuntime().exec("adb shell am force-stop com.android.settings");
+			Thread.sleep(5000);
+			Runtime.getRuntime().exec("adb shell am start -a android.settings.WIFI_SETTINGS");
 
+			Thread.sleep(3000);
+			WebElement element = driver.findElement(MobileBy.AndroidUIAutomator(
+					"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().textContains(\""
+							+ serialno + "\"))"));
+			wait.until(ExpectedConditions.visibilityOf(element));
+			wait.until(ExpectedConditions.elementToBeClickable(element));
+			element.click();
+			if (isElementDisplayedCheck(enterpasswordwifipge)) {
+				entervaluebyXpath(enterpasswordwifipge, "wifipage password", "mypassword");
+				hidekeyboard();
+
+				clickbyXpath(connectbuttonWifipage, "connect button");
+			} else if (isElementDisplayedCheck(enterpasswordwifipgehighversion
+					)) {
+
+				entervaluebyXpath(enterpasswordwifipge, "wifipage password", "mypassword");
+				hidekeyboard();
+
+				clickbyXpath(savebuttonWifipage, "save button");
+			} else {
+				System.out.println("Already password saved ");
+			}
+
+			if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+				driver.activateApp(packages); // Bring it back
+				// WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+			}
+			if (isElementDisplayedCheck(Blepopup_afterpairing)) {
+
+				clickbyXpath(Blepopup_afterpairing, "oK button of Ble alert pop-up");
+			}
+
+			// Now click the OK button once it is visible and clickable
+
+		} else {
+			System.out.println("unable to connect with device hotspot");
+		}
+		
+	}
+	private void unregistereddevicepopup() {
+		if (isElementDisplayedCheck(unregisteredpopup)) {
+
+			clickbyXpath(alertpopup, "alertokpop-up");
+		}
+	}
+	private void retrypagecheck(int mode) throws Exception {
+		if (isiconDisplayed(Retrypagetext, "Retry page")) {
+
+			fail(new Exception("Retry page displayed"));
+//			clickbyXpath(Retrypageretrybutton, "retrypage");
+
+//			readwrite.write("factory_reset\r");
+//			driver.navigate().back();
+//			clickbyXpath(alertok, "clicking on exit pop-up ");
+//			proceedToAddDevice(mode);
+		} else {
+			System.out.println("Retry page not displayed proceeding to next step");
+		}
+		
+	}
+	
+	private void blepermissionokpopup() throws Exception {
+		if (isElementDisplayedCheck(BleOKpopup)) {
+			BleOKpopup.click();
+			Thread.sleep(2000);
+			checkappinforeground();
+
+		} else {
+			System.out.println("No alert pop ups displayed");
+		}
+		
+	}
+	private void blepermissioncancelpopup() throws Exception {
+		if (isElementDisplayedCheck(BLEcancelpopup)) {
+			BLEcancelpopup.click();
+			if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+				driver.activateApp(packages); // Bring it back
+				Thread.sleep(2000);
+			}
+		} else {
+			System.out.println("Alert pop-up not displayed");
+		}
+	}
 	public void hidekeyboard() {
 		// Scroll up
 		Map<String, Object> params = new HashMap<>();
@@ -995,8 +932,88 @@ public void aCBrandNameClick ()
 		driver.executeScript("mobile: hideKeyboard", params);
 	}
 
+	public void checkdevicedetailstoast() {
 
-	
+		verifyTextContainsByXpath(sZhephyrInfotoast, deviceDetailsUpdated,
+				"Device details updated successfully! toast");
+	}
 
+	public void checkdevicesettingstoast() {
+
+		verifyTextContainsByXpath(Devicesettingstoast, devicesettingsupdatesuccess,
+				"Device settings updated successfully! toast");
+	}
+
+	public void checkdeviceremovedtoast() {
+
+		verifyTextContainsByXpath(deviceremovedtoast, DeviceRemovedSuccessfully, "  DeviceRemovedSuccessfully toast");
+	}
+
+	public void checkdeviceresettoast() {
+
+		verifyTextContainsByXpath(deviceresettoast, YourDeviceResetSuccessfully, "  YourDeviceResetSuccessfully toast");
+	}
+
+	public void checkrouteraddedsuccessfultoast() {
+
+		verifyTextContainsByXpath(routeraddedsuccessfullytoast, RouterAddedSuccessfully,
+				" RouterAddedSuccessfully toast");
+	}
+
+	public void bleConnectivityCheck() {
+		connectivitycheck(bleConnectivity, "Ble connectivity homepage icon");
+
+	}
+
+	public void staConnectivityCheck() {
+		connectivitycheck(staConnectivity, "STA connectivity homepage icon");
+
+	}
+
+	public void remoteConnectivityCheck() {
+		connectivitycheck(remoteConnectivity, "Remote connectivity homepage icon");
+
+	}
+public void removingDevice() throws InterruptedException {
+
+	int n=5;
+	while (n>0) {
+		
+		if (isElementDisplayed(menuBarButton,"Menu Bar button")) {
+			homepage.clickMenuBarButton();
+			if (isElementDisplayed(removeDevice, "Remove device button")) {
+				devicemenupage.clickMenuBarRemoveDevice();
+				devicemenupage.clickRemoveDevicePopupYesButton();
+				checkdeviceremovedtoast();
+				Thread.sleep(2000);//or5000
+				if (isElementDisplayedCheck(deviceofflinealertTitle)) {
+					String text = deviceofflinealertTitle.getText();
+					System.out.println(text + "  Alert pop-up displayed");
+					clickbyXpath(alertok, "Alert ok button");
+
+				} else if (isElementDisplayedCheck(buttonPressAlert)) {
+					String text = buttonPressAlert.getText();
+					System.out.println(text + "  Alert pop-up displayed");
+					clickbyXpath(alertok, "Alert ok button");
+
+				} else {
+					System.out.println("removed");
+				}
+			}
+			
+			devicemenupage.AddDevicePagedisplayed();
+			break;
+		}
+		else if (isElementDisplayed(signInButton,"signin button displayed")) {
+			System.out.println("signin page displayed");
+			break;
+		}
+		else {
+			System.out.println("something went wrong");
+			n--;
+		}
+		
+	}
+}
 
 }

@@ -4,11 +4,15 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.sql.Time;
+import java.time.Duration;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
@@ -17,7 +21,9 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPFile;
 import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -27,9 +33,11 @@ import io.appium.java_client.MobileBy;
 import io.appium.java_client.android.AndroidDriver;
 import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.appmanagement.ApplicationState;
-import io.appium.java_client.Setting;
 import com.aventstack.extentreports.ExtentReports;
 import com.aventstack.extentreports.ExtentTest;
+import com.aventstack.extentreports.model.Log;
+import com.google.common.collect.ImmutableMap;
+import org.testng.Assert;
 
 import utils.Reporter;
 import utils.logReadandWrite;
@@ -37,69 +45,93 @@ import utils.logReadandWrite;
 public class GenericWrappers {
  
 	
-	
+	public String packages=loadProp("APP_PACKAGE");
 	public static AndroidDriver<AndroidElement> driver;
 	public WebDriverWait wait;
 	static ExtentTest test;
 	static ExtentReports report;
 	public String sUrl, primaryWindowHandle, sHubUrl, sHubPort;
-
 	
-	public Properties loadProp() {
+	public String loadProp(String property) {
 		Properties prop = new Properties();
 		try {
 			prop.load(new FileInputStream(new File("./config.properties")));
-			sHubUrl = prop.getProperty("HUB");
-			sHubPort = prop.getProperty("PORT");
-			sUrl = prop.getProperty("URL");
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return prop;
+		return prop.getProperty(property);
 	}
 
 	public static boolean initAndriodDriver() throws FileNotFoundException, IOException {
-logReadandWrite log = new logReadandWrite("COM4");
+
 		boolean bReturn = false;
 		Properties prop = new Properties();
 		try {
 			prop.load(new FileInputStream(new File("./config.properties")));
 			DesiredCapabilities caps = new DesiredCapabilities();
-			// caps.setCapability("app",
-			// "C:/Users/Invcuser_106/Desktop/apk/Android_SZephyr_12431_stg.apk");
 			caps.setCapability("platformName", prop.getProperty("PLATFORM_NAME"));
 			caps.setCapability("appium:platformVersion", prop.getProperty("PLATFORM_VERSION"));
 			caps.setCapability("appium:udid", prop.getProperty("UDID"));
 			caps.setCapability("appium:deviceName", prop.getProperty("DEVICE_NAME"));
 
-			//			caps.setCapability("appium:appPackage", prop.getProperty("APP_PACKAGE"));
-			//			caps.setCapability("appium:appActivity", prop.getProperty("APP_ACTIVITY"));
 			caps.setCapability("appium:automationName", "uiautomator2");
+			caps.setCapability("appium:ignoreHiddenApiPolicyError", "true");
 			caps.setCapability("newCommandTimeout", 999999);
-			//			caps.setCapability("autoGrantPermissions", true);
-//			caps.setCapability("enforceXPath1", true);
-//			driver.setSetting(Setting.WAIT_FOR_IDLE_TIMEOUT, 10000);
-			driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723"), caps);
-//						keepSessionAlive(driver);
-
-			bReturn = true;
+//			caps.setCapability("appium:autoGrantPermissions", true);
 			
+
+			//			keepSessionAlive(driver);
+			
+			driver = new AndroidDriver<AndroidElement>(new URL("http://127.0.0.1:4723"), caps);
+
+			Reporter.reportStep("Appium server started successfully ", "INFO");
+			Reporter.reportStep(
+				    "Platform name: " + prop.getProperty("PLATFORM_NAME") + "<br>" + 
+				    "Platform version: " + prop.getProperty("PLATFORM_VERSION") + "<br>" + 
+				    "Device UDID: " + prop.getProperty("UDID") + "<br>" + 
+				    "Device Name: " + prop.getProperty("DEVICE_NAME")+ "<br>" +
+				    "App Revision No: "+prop.getProperty("APP_REVISION_NO")+"<br>"+
+				    "Device Revision No: "+prop.getProperty("DEVICE_REVISION_NO")+"<br>"+
+				    "Router Name: "+prop.getProperty("WIFINAME")+"<br>"+
+				    "Remote Router Name: "+prop.getProperty("REMOTEWIFINAME"), 
+				    
+				    "INFO"
+				);
+
+
+			
+
+
 			String appPackage = prop.getProperty("APP_PACKAGE");
 			if (driver.isAppInstalled(appPackage)) {
 				System.out.println("App is already installed. Launching the app...");
 				driver.activateApp(appPackage); // Open the app
 			} else {
 				System.out.println("App is not installed. Installing and launching...");
-				driver.installApp(
-						"C:\\Users\\Invcuser_45\\Desktop\\Ashif\\Automation_Ashif\\Android_SZephyr_13309_stg.apk");
+				driver.installApp(prop.getProperty("APP_PATH"));
 				driver.activateApp(appPackage); // Launch the app after installation
 			}
+			
+			if (driver.isAppInstalled(appPackage)) {
+				Reporter.reportStep("The app:" + appPackage + " launched successfully", "PASS");
+			}
+			else {
+				Reporter.reportStep("The app:" + appPackage + " not launched", "FAIL");
+				
+			}
+			Reporter.reportStep("App opened successfully", "INFO");
+			driver.executeScript("mobile: shell", ImmutableMap.of("command", "pm grant com.iinvsys.szephyr android.permission.ACCESS_FINE_LOCATION"));
+			driver.executeScript("mobile: shell", ImmutableMap.of("command", "pm grant com.iinvsys.szephyr android.permission.BLUETOOTH_SCAN"));
+			driver.executeScript("mobile: shell", ImmutableMap.of("command", "pm grant com.iinvsys.szephyr android.permission.BLUETOOTH_CONNECT"));
+			bReturn = true;
 
 		} catch (MalformedURLException e) {
-			System.out.println("URL is malformed: " + e.getMessage());
+			System.out.println("App not launched" + e.getMessage());
 			e.printStackTrace();
+			Reporter.reportStep("The app not launched", "FAIL");
 		}
 		return bReturn;
 	}
@@ -140,7 +172,7 @@ logReadandWrite log = new logReadandWrite("COM4");
 	//		return bReturn;
 	//	}
 
-	public static void keepSessionAlive(AndroidDriver<AndroidElement> driver) {
+	public static void keepSessionAlive(AndroidDriver driver) {
 		ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 		scheduler.scheduleAtFixedRate(() -> {
 			try {
@@ -168,7 +200,7 @@ logReadandWrite log = new logReadandWrite("COM4");
 	public static boolean clickbyXpath(WebElement xpath, String button) {
 		boolean bReturn = false;
 		try {
-			expWait(xpath);
+			expshortWait(xpath);
 			xpath.click();
 			Reporter.reportStep(button + " is clicked Successfully.", "PASS");
 			bReturn = true;
@@ -232,7 +264,7 @@ logReadandWrite log = new logReadandWrite("COM4");
 	public boolean entervaluebyXpath(WebElement xpath, String fieldname, String value) {
 		boolean bReturn = false;
 		try {
-			expWait(xpath);
+			expshortWait(xpath);
 			xpath.sendKeys(value);
 			Reporter.reportStep(fieldname + " field is entered with value : " + value, "PASS");
 
@@ -289,6 +321,7 @@ logReadandWrite log = new logReadandWrite("COM4");
 				Reporter.reportStep(field + " did not contain :" + text, "FAIL");
 			}
 		} catch (Exception e) {
+			Reporter.reportStep(field + " not displayed", "FAIL&RUN");
 			e.printStackTrace();
 		}
 		return bReturn;
@@ -309,7 +342,7 @@ logReadandWrite log = new logReadandWrite("COM4");
 	public static void expWait(WebElement xpath) {
 		try {
 
-			WebDriverWait wait = new WebDriverWait(driver,15);
+			WebDriverWait wait = new WebDriverWait(driver,30);
 			wait.until(ExpectedConditions.visibilityOf(xpath));
 		} catch (Exception e) {
 			System.out.println(e);
@@ -319,10 +352,36 @@ logReadandWrite log = new logReadandWrite("COM4");
 		}
 
 	}
+	public static void expshortWait(WebElement xpath) {
+		try {
+			
+			WebDriverWait wait = new WebDriverWait(driver,10);
+			wait.until(ExpectedConditions.visibilityOf(xpath));
+		} catch (Exception e) {
+			System.out.println(e);
+			
+			
+			
+		}
+		
+	}
+	public static void expshortWaittwenty(WebElement xpath) {
+		try {
+			
+			WebDriverWait wait = new WebDriverWait(driver,20);
+			wait.until(ExpectedConditions.visibilityOf(xpath));
+		} catch (Exception e) {
+			System.out.println(e);
+			
+			
+			
+		}
+		
+	}
 
 	public void expWaitforPairing(WebElement xpath) {
 		try {
-			WebDriverWait wait = new WebDriverWait(driver,100);
+			WebDriverWait wait = new WebDriverWait(driver,30);
 			wait.until(ExpectedConditions.visibilityOf(xpath));
 		} catch (Exception e) {
 			System.out.println(e);
@@ -403,105 +462,46 @@ logReadandWrite log = new logReadandWrite("COM4");
 
 
 
-	private FTPClient ftpClient;
-	private String randomDirName;
-
-	String server2="ftp.iinvsys.com";
-	int port2=2121;
-	// Constructor to connect and login to FTP server
-	public void FTPUploader(String server, int port, String user, String pass) throws IOException {
-
-		ftpClient = new FTPClient();
-		if (!pingServer(server)) {
-			System.out.println(server + " is not reachable. Trying " + server2);
-			connectToServer(server2, port2, user, pass);
-		} else {
-			connectToServer(server, port, user, pass);
-		}
 
 
 
-	}
+	public void closeApp() {
 
-	private void connectToServer(String server, int port, String user, String pass) throws IOException {
-		ftpClient.connect(server, port);
-		boolean login = ftpClient.login(user, pass);
-
-		if (!login) {
-			throw new IOException("FTP login failed for server: " + server);
-		}
-
-		ftpClient.enterLocalPassiveMode(); // Set passive mode for FTP
-		ftpClient.setFileType(FTP.BINARY_FILE_TYPE); // Use binary file type
-	}
-	private boolean pingServer(String server) {
 		try {
-			InetAddress address = InetAddress.getByName(server);
-			return address.isReachable(2000); // Timeout after 2000 ms
-		} catch (IOException e) {
-			return false; // If there's an exception, the server is not reachable
-		}
-	}
-	// Method to create a subdirectory and change the working directory to it
-	public void createAndNavigateToSubdirectory(String existingDirectory, String newSubDir) throws IOException {
-		// Navigate to the existing directory
-		if (ftpClient.changeWorkingDirectory(existingDirectory)) {
-			System.out.println("Navigated to directory: " + existingDirectory);
-
-			// Create a new subdirectory
-			if (ftpClient.makeDirectory(newSubDir)) {
-				System.out.println("Created new subdirectory: " + newSubDir);
-
-				// Change the working directory to the new subdirectory
-				if (ftpClient.changeWorkingDirectory(newSubDir)) {
-					System.out.println("Changed to new subdirectory: " + newSubDir);
-				} else {
-					throw new IOException("Failed to change to the new subdirectory");
-				}
-			} else {
-				throw new IOException("Failed to create new subdirectory: " + newSubDir);
+			if (driver != null) {
+				// Kill the app (terminate it)
+				driver.terminateApp(packages);
+				Reporter.reportStep("The app was killed successfully.", "PASS");
 			}
-		} else {
-			throw new IOException("Failed to change directory to: " + existingDirectory);
+		} catch (Exception e) {
+			Reporter.reportStep("The app could not killed .", "FAIL");
 		}
 	}
-
-	// Method to upload a file to the current directory
-	public void uploadFile(String localFilePath, String remoteFileName) throws IOException {
-		try (FileInputStream fis = new FileInputStream(new File(localFilePath))) {
-			boolean success = ftpClient.storeFile(remoteFileName, fis);
-			if (success) {
-				System.out.println("File uploaded successfully to FTP: " + remoteFileName);
-			} else {
-				System.out.println("File upload failed.");
-			}
+	
+	public void openapp() {
+		try {
+			
+				// Kill the app (terminate it)
+				driver.activateApp(packages);
+				Reporter.reportStep("The app was opened successfully.", "PASS");
+			
+		} catch (Exception e) {
+			Reporter.reportStep("The app  not opened .", "FAIL");
 		}
 	}
-
-	// Close the FTP connection
-	public void disconnect() throws IOException {
-		if (ftpClient.isConnected()) {
-			ftpClient.logout();
-			ftpClient.disconnect();
-		}
-
-	}
-
-
-
-
+	
 	public void killAndReopenApp() {
 		try {
 			if (driver != null) {
 				// Kill the app (terminate it)
-				driver.terminateApp("com.iinvsys.szephyr");
+				driver.terminateApp(packages);
 				Reporter.reportStep("The app was killed successfully.", "PASS");
 
 				// Wait for a few seconds before reopening the app
 				Thread.sleep(3000);
 
 				// Reopen the app, it should maintain its previous state (same page)
-				driver.activateApp("com.iinvsys.szephyr");
+				driver.activateApp(packages);
 				Reporter.reportStep("The app was reopened successfully.", "PASS");
 			}
 		} catch (Exception e) {
@@ -570,14 +570,14 @@ logReadandWrite log = new logReadandWrite("COM4");
 
 
 
-	@SuppressWarnings("deprecation")
 	public void connectToWiFi(String wifiName, String wifiPassword) {
 		try {
+			
 			// Open WiFi settings on the Android device
 			Runtime.getRuntime().exec("adb shell svc wifi enable");
 			Runtime.getRuntime().exec("adb shell am start -a android.settings.WIFI_SETTINGS");
 			// Wait for the WiFi settings to open
-			Thread.sleep(5000);
+			Thread.sleep(3000);
 
 			// Scroll to the WiFi network by name
 			WebElement wifiElement = driver.findElement(MobileBy.AndroidUIAutomator(
@@ -586,25 +586,48 @@ logReadandWrite log = new logReadandWrite("COM4");
 
 
 			// Click on the WiFi network
-			clickByXpath(wifiElement, "Clicked on " + wifiName + " on Wi-Fi page");
+			clickbyXpath(wifiElement, "Clicked on " + wifiName + " on Wi-Fi page");
 
 		
 			// Check if the password entry field is displayed
-			WebElement enterPasswordField = driver.findElement(MobileBy.xpath("//android.widget.EditText[@resource-id=\"com.android.settings:id/password\"]")); // Replace with the actual XPath
-			if (isElementDisplayed(enterPasswordField)) {
-				// Enter the WiFi password
-				enterValueByXpath(enterPasswordField, "Wi-Fi password", wifiPassword);
+			try {
+				WebElement enterPasswordField = driver.findElement(MobileBy.xpath("//android.widget.EditText[@resource-id=\"com.android.settings:id/password\"]")); // Replace with the actual XPath
+				WebElement enterPasswordFieldOnePlus = driver.findElement(MobileBy.xpath("(//android.widget.LinearLayout[@resource-id=\"com.oplus.wirelesssettings:id/edittext_container\"])[1]")); // Replace with the actual XPath
+				if (isElementDisplayedCheck(enterPasswordField)) {
+					// Enter the WiFi password
+					enterValueByXpathwifipage(enterPasswordField, "Wi-Fi password", wifiPassword);
 
-				// Click on the connect button
-				WebElement connectButton = driver.findElement(MobileBy.xpath("//android.widget.Button[@resource-id='android:id/button1']")); // Replace with the actual XPath
-				clickByXpath(connectButton, "Connect button");
+					// Click on the connect button
+					WebElement connectButton = driver.findElement(MobileBy.xpath("//android.widget.Button[@resource-id='android:id/button1']")); 
+					// Replace with the actual XPath
+					if (isElementDisplayedCheck(connectButton)) {
+						
+						clickbyXpath(connectButton, "Connect button");
+						
+						Thread.sleep(3000);}
 
-				Thread.sleep(5000);
-
-			} else {
-				System.out.println("Already connected or password is saved.");
-			
+				}
+				
+				else if (isElementDisplayedCheck(enterPasswordFieldOnePlus)) {
+					enterValueByXpathwifipage(enterPasswordFieldOnePlus, "Wi-Fi password", wifiPassword);
+					WebElement savebutton = driver.findElement(MobileBy.xpath("//android.widget.TextView[@resource-id=\"com.oplus.wirelesssettings:id/menu_save\"]")); 
+				 if (isElementDisplayedCheck(savebutton)) {
+					clickbyXpath(savebutton, "save button");
+					
+					Thread.sleep(3000);
+				}
+					
+				} 
+				else {
+					System.out.println("Already connected or password is saved.");
+				
+				}
+			} catch (NoSuchElementException e) {
+			    System.out.println("WIFI Password is Already Provided, continuing to the next step.");
 			}
+			
+			
+			
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -612,22 +635,58 @@ logReadandWrite log = new logReadandWrite("COM4");
 	}
 
 	// Helper method to check if the element is displayed
-	public boolean isElementDisplayed(WebElement element) {
+	public boolean isElementDisplayed(WebElement element,String Field) {
 		try {
-			Thread.sleep(1000);  // Introduce a small delay before checking visibility
+			expshortWait(element);// Introduce a small delay before checking visibility
+			  
+			if (element.isDisplayed()) {
+				
+				Reporter.reportStep(Field +"  Element displayed", "PASS");
+			}
+			else {
+			Reporter.reportStep(Field+"Element not displayed", "FAIL");
+				
+			}
+			return true;
+		} catch (NoSuchElementException e) {
+			Reporter.reportStep(Field+"Element not displayed", "FAIL");
+			return false;
+		}
+	}
+	public boolean isElementDisplayednext(WebElement element,String Field) {
+		try {
+			expshortWaittwenty(element);// Introduce a small delay before checking visibility
+			
+			if (element.isDisplayed()) {
+				
+				Reporter.reportStep(Field +"  Element displayed", "PASS");
+			}
+			else {
+				Reporter.reportStep(Field+"Element not displayed", "FAIL");
+				
+			}
+			return true;
+		} catch (NoSuchElementException e) {
+			Reporter.reportStep(Field+"Element not displayed", "FAIL");
+			return false;
+		}
+	}
+	
+	
+
+	public boolean retryWait(WebElement element) {
+		try {
+			Thread.sleep(80*1000);  // Introduce a small delay before checking visibility
+			Reporter.reportStep(element+"Element displayed", "PASS");
 			return element.isDisplayed();
 		} catch (NoSuchElementException | InterruptedException e) {
+//			Reporter.reportStep(element+"Element not displayed", "INFO");
 			return false;
 		}
 	}
 
-	// Example methods for clicking and entering values (to be replaced with your actual implementations)
-	public void clickByXpath(WebElement element, String description) {
-		element.click();
-		System.out.println(description);
-	}
 
-	public void enterValueByXpath(WebElement element, String fieldName, String value) {
+	public void enterValueByXpathwifipage(WebElement element, String fieldName, String value) {
 		element.sendKeys(value);
 		System.out.println("Entered value in " + fieldName + ": " + value);
 	}
@@ -656,26 +715,272 @@ logReadandWrite log = new logReadandWrite("COM4");
 		}
 	}
 
-	public void killsession() {
-		try {
-			if (driver != null) {
-				// Kill the app (terminate it)
-				driver.terminateApp("com.iinvsys.szephyr");
-//				Reporter.reportStep("The app was killed successfully.", "PASS");
-			}
-		} catch (Exception e) {
-//			Reporter.reportStep("The app could not be killed and reopened.", "FAIL");
-		}
-
-	}
 	public void close() {
-		driver.terminateApp("com.iinvsys.szephyr");
+		driver.terminateApp(packages);
 		driver.quit();
 	}
 	public void checkappinforeground() throws Exception {
-		if (driver.queryAppState("com.iinvsys.szephyr") != ApplicationState.RUNNING_IN_FOREGROUND) {
-			driver.activateApp("com.iinvsys.szephyr"); // Bring it back
+		if (driver.queryAppState(packages) != ApplicationState.RUNNING_IN_FOREGROUND) {
+			driver.activateApp(packages); // Bring it back
 			Thread.sleep(3000);
 		}
 	}
+	
+	public boolean connectivitycheck(WebElement element,String field) {
+
+		try {
+			expWait(element);// Introduce a small delay before checking visibility
+			  
+			if (element.isDisplayed()) {
+				
+				Reporter.reportStep(field +"  Element displayed", "PASS");
+			}
+			else {
+			Reporter.reportStep(field+"Element not displayed", "INFO");
+				
+			}
+			return true;
+		} catch (NoSuchElementException e) {
+			Reporter.reportStep(field+"Element not displayed", "INFO");
+			return false;
+		}
+	
+	}
+	public boolean isiconDisplayed(WebElement element,String field) {
+		try {
+			expWaitforPairing(element);// Introduce a small delay before checking visibility
+			  
+			if (element.isDisplayed()) {
+				
+				Reporter.reportStep(field +"  Element displayed", "PASS");
+			}
+			else {
+			Reporter.reportStep(field+"Element not displayed", "INFO");
+				
+			}
+			return true;
+		} catch (NoSuchElementException e) {
+			Reporter.reportStep(field+"Element not displayed", "INFO");
+			return false;
+		}
+	}
+	
+	public WebElement scrollToText(String text) {
+        try {
+            return driver.findElement(MobileBy.AndroidUIAutomator(
+                "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\"" + text + "\"));"
+            ));
+            
+        } catch (Exception e) {
+            System.out.println("Unable to scroll to text: " + text);
+            Reporter.reportStep("Unable to scroll to Field"+text, "FAIL");
+            return null;
+        }
+    }
+	
+	
+	
+	private FTPClient ftpClient;
+
+	String server2="ftp.iinvsys.com";
+	int port2=2121;
+	// Constructor to connect and login to FTP server
+	public void FTPUploader(String server, int port, String user, String pass) throws IOException {
+
+		ftpClient = new FTPClient();
+		if (!pingServer(server)) {
+			System.out.println(server + " is not reachable. Trying " + server2);
+			connectToServer(server2, port2, user, pass);
+		} else {
+			connectToServer(server, port, user, pass);
+		}
+
+
+
+	}
+
+	private void connectToServer(String server, int port, String user, String pass) throws IOException {
+		ftpClient.connect(server, port);
+		boolean login = ftpClient.login(user, pass);
+
+		if (!login) {
+			throw new IOException("FTP login failed for server: " + server);
+		}
+
+		ftpClient.enterLocalPassiveMode(); // Set passive mode for FTP
+		ftpClient.setFileType(FTP.BINARY_FILE_TYPE); // Use binary file type
+	}
+	private boolean pingServer(String server) {
+		try {
+			InetAddress address = InetAddress.getByName(server);
+			return address.isReachable(2000); // Timeout after 2000 ms
+		} catch (IOException e) {
+			return false; // If there's an exception, the server is not reachable
+		}
+	}
+	// Method to create a subdirectory and change the working directory to it
+	public void createAndNavigateToSubdirectory(String existingDirectory, String newSubDir) throws IOException {
+		// Navigate to the existing directory
+		if (ftpClient.changeWorkingDirectory(existingDirectory)) {
+			System.out.println("Navigated to directory: " + existingDirectory);
+
+			// Create a new subdirectory
+			if (ftpClient.makeDirectory(newSubDir)) {
+				System.out.println("Created new subdirectory: " + newSubDir);
+
+				// Change the working directory to the new subdirectory
+				if (ftpClient.changeWorkingDirectory(newSubDir)) {
+					System.out.println("Changed to new subdirectory: " + newSubDir);
+				} else {
+					throw new IOException("Failed to change to the new subdirectory");
+				}
+			} else {
+				throw new IOException("Failed to create new subdirectory: " + newSubDir);
+			}
+		} else {
+			throw new IOException("Failed to change directory to: " + existingDirectory);
+		}
+	}
+
+	// Method to upload a file to the current directory
+	public void uploadFile(String localFilePath, String remoteFileName) throws IOException {
+		try (FileInputStream fis = new FileInputStream(new File(localFilePath))) {
+			boolean success = ftpClient.storeFile(remoteFileName, fis);
+			if (success) {
+				System.out.println("File uploaded successfully to FTP: " + remoteFileName);
+				
+			} else {
+				System.out.println("File upload failed.");
+			}
+		}
+	}
+	
+	
+	
+
+	// Close the FTP connection
+	public void disconnect() throws IOException {
+		if (ftpClient.isConnected()) {
+			ftpClient.logout();
+			ftpClient.disconnect();
+		}
+
+	}
+
+	
+	public void getLatestApk(String baseRemotePath,String localDirectory,String newFileName) throws IOException {
+		// Add current week to the path
+        String weekFolder = "W52"; //getCurrentWeekFolder();
+        String remotePathWithWeek = baseRemotePath+weekFolder+"/";
+        System.out.println("Looking in directory: " + remotePathWithWeek);
+
+        // Get the latest folder within the week directory
+        String latestFolder = getLatestFolder(ftpClient, remotePathWithWeek);
+        if (latestFolder != null) {
+            String targetDirectory = remotePathWithWeek + latestFolder + "/";
+            System.out.println("Latest folder found: " + targetDirectory);
+
+            File localFolder = new File(localDirectory);
+            deleteAllFilesInFolder(localFolder);
+            
+            // Search for the file containing "szhephyr" in the latest folder
+            FTPFile[] files = ftpClient.listFiles(targetDirectory);
+            for (FTPFile file : files) {
+            	System.out.println(file);//////////////////////
+                if (file.isFile() && file.getName().contains("Android_SZephyr")) {
+                    String downloadedFileName = file.getName();
+                    File localFile = new File(localDirectory + File.separator + downloadedFileName);
+
+                    // Download the file
+                    try (FileOutputStream outputStream = new FileOutputStream(localFile)) {
+                        boolean success = ftpClient.retrieveFile(targetDirectory + downloadedFileName, outputStream);
+                        if (success) {
+                            System.out.println("Downloaded: " + downloadedFileName);
+                        } else {
+                            System.out.println("Failed to download: " + downloadedFileName);
+                        }
+                    }
+
+                    // Rename the downloaded file
+                    File renamedFile = new File(localDirectory + File.separator + newFileName);
+                    boolean renamed = localFile.renameTo(renamedFile);
+                    if (renamed) {
+                        System.out.println("File renamed to: " + newFileName);
+                    } else {
+                        System.out.println("Failed to rename file.");
+                    }
+
+                    break;
+                } else {
+                	 System.out.println("APK file not found at: " + localDirectory);
+                     // Fail the entire suite if APK is missing
+                     Assert.fail("APK file is required to run the test suite but was not found.");
+                }
+            }
+        } else {
+        	 System.out.println("APK file not found at: " + localDirectory);
+             // Fail the entire suite if APK is missing
+             Assert.fail("APK file is required to run the test suite but was not found.");
+            System.out.println("No latest folder found for the week.");
+        }
+	}
+	
+	
+	// Get the latest folder from a given directory on the FTP server
+    private static String getLatestFolder(FTPClient ftpClient, String directoryPath) throws IOException {
+    	
+    	
+    	
+        FTPFile[] directories = ftpClient.listDirectories(directoryPath);
+
+        if (directories.length == 0) {
+            return null;
+        }
+
+        FTPFile latestDir = null;
+        for (FTPFile dir : directories) {
+            if (dir.isDirectory()) {
+                if (latestDir == null || dir.getTimestamp().getTime().after(latestDir.getTimestamp().getTime())) {
+                    latestDir = dir;
+                }
+            }
+        }
+
+        return latestDir != null ? latestDir.getName() : null;
+    }
+    private static String getCurrentWeekFolder() {
+        Calendar calendar = Calendar.getInstance();
+        int weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR);
+        
+        return "W"+(weekOfYear-1);
+    }
+    
+    private static void deleteAllFilesInFolder(File folder) {
+        if (folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
+                    }
+                }
+            }
+        }
+    }
+	
+    public void fail(Exception e) {
+    	 System.err.println("Failure occurred: " + e.getMessage());
+    	 Reporter.reportStep(e+"Testcase failed", "FAIL");
+    	 throw new RuntimeException(e);
+	}
+    
+    public boolean isElementDisplayedCheck(WebElement element) {
+        try {
+        	expshortWait(element);
+            return element.isDisplayed();
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return false;
+        }
+    }
+
 }

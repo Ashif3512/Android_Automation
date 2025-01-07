@@ -1,4 +1,5 @@
 package pages;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class AccountsInfoPage extends GenericWrappers{
 
 	// Locate all elements on the page
 
-	@FindBy(xpath = "//*[@resource-id='accountsText']")
+	@FindBy(xpath = "//*[@resource-id='menu_text_accounts']")
 	private WebElement  AccountsinfoButtonbeforeadddevice;
 	
 	@FindBy(xpath = "//*[@resource-id='menu_text_accounts']")
@@ -40,16 +41,16 @@ public class AccountsInfoPage extends GenericWrappers{
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Accounts_FirmwareAutoUpdate\"]/android.view.ViewGroup/android.view.ViewGroup")
 	private WebElement FirmwareUpdateSettingButton;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Accounts_DeleteAccount_SubTitle\"]")
+	@FindBy(xpath = "//*[@resource-id='Accounts_DeleteAccount_SubTitle']")
 	private WebElement DeleteAccountButton;
 
-	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.Button")
-	private WebElement AccountDeleteButton;
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+	private WebElement AccountDeleteButton;	
 
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement AccountInfoBackButton;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/menu_text_removeDevice\"] ")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_removeDevice']")
 	private WebElement Clickremovedevicebutton;
 
 	@FindBy(xpath = "//android.widget.TextView[@text=\"YES\"]")
@@ -58,10 +59,10 @@ public class AccountsInfoPage extends GenericWrappers{
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Options_Icon\"]")
 	private WebElement Clickmenubaricon;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/accountsText\"]")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_accounts']")
 	private WebElement Clickaccountinfo;
 
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Accounts_DeleteAccount_SubTitle, com.szephyr:id/Accounts_DeleteAccount_SubTitle1\"]")
+	@FindBy(xpath = "//*[@resource-id='Accounts_DeleteAccount_SubTitle']")
 	private WebElement Clickaccountdelete;
 
 	@FindBy(xpath = "/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.Button[2]")
@@ -70,37 +71,50 @@ public class AccountsInfoPage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.TextView[@text=\"\"]")
 	private WebElement menuBarButton;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Accounts_YourName\"]")
+	@FindBy(xpath = "//*[@resource-id='Accounts_YourName']")
 	private WebElement Usernamefield;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Accounts_YourEmail\"]")
+	@FindBy(xpath = "//*[@resource-id='Accounts_YourEmail']")
 	private WebElement emailIdfield;
 
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Accounts_Language_Sub_Title\"]")
+	@FindBy(xpath = "//*[@resource-id='Accounts_Language_Sub_Title']")
 	private WebElement languagesubtitle;
 
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
 	private WebElement accountsdelpop_up;
+	
+	@FindBy(xpath = "//android.widget.TextView[@text=\"OK\"]")
+	private WebElement accountsdelpop_up_withdevice;
+	
+	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button1\"]")
+	private WebElement accountsdelpop_up_withoutdevice;
+	
 
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button2\"]")
 	private WebElement accountspop_upcancelbtn;
 
 	@FindBy(xpath = "//android.widget.Toast[@text=\"User Not Found\"]")
 	private WebElement toast;
+	
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Device removed successfully\"]")
+	private WebElement deviceremovedtoast;
+	
+	@FindBy(xpath = "//android.widget.Toast[@text=\"Your account has been deleted successfully\"]")
+	private WebElement accountdeletedtoast;
 
 	@FindBy(xpath = "//android.widget.TextView[@text='Sign Up']")
 	private WebElement signUpButton;
 	
-	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"com.szephyr:id/SignUp_Username\"]")
+	@FindBy(xpath = "//*[@resource-id='SignUp_Username']")
 	private WebElement usernamesignup;
 	
-	@FindBy(xpath = "//android.widget.EditText[@content-desc=\"com.szephyr:id/SignUp_Email\"]")
+	@FindBy(xpath = "//*[@resource-id='SignUp_Email']")
 	private WebElement emailidsignup;
 	
-	@FindBy(xpath = "//android.widget.CheckBox[@content-desc=\"com.szephyr:id/SignUp_Checkbox\"]")
+	@FindBy(xpath = "//*[@resource-id='SignUp_Checkbox']")
 	private WebElement checkboxsignup;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/SignUp_SignUpText\"]")
+	@FindBy(xpath = "//*[@resource-id='SignUp_SignUpText']")
 	private WebElement signUptxt;
 	
 	@FindBy(xpath = "//*[@resource-id='OTP_ButtonText']")
@@ -109,13 +123,13 @@ public class AccountsInfoPage extends GenericWrappers{
 	@FindBy(xpath = "//*[@resource-id='Add_Devices_ButtonText']")
 	private WebElement addDeviceButton;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement DevicesettingsbackButton;
 	
 	@FindBy(xpath = "//android.widget.TextView[@text=\"YES\"]")
 	private WebElement removeDevicePopupYesButton;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_removeDevice, com.szephyr:id/menu_text_removeDevice\"]")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_removeDevice']")
 	private WebElement removeDevice;
 	
 	@FindBy(xpath = "//*[@resource-id='OTP_VerifyText']")
@@ -143,9 +157,9 @@ public class AccountsInfoPage extends GenericWrappers{
 
 
 	public String accountdel_Toast="Your account has been deleted successfully";
-	public String device_removed_Toast="Device removed successfully";
-	public String userName="testuser007"; 
-	public String emaId="testuser007@gmail.com";
+	public String device_removed_Toast=loadProp("DeviceRemovedSuccessfully");
+	public String userName=loadProp("USERNAME"); ; 
+	public String emaId=loadProp("EMAILID");
 	// Constructor to initialize the driver and instantiate elements using
 
 	public AccountsInfoPage(AndroidDriver driver) {
@@ -200,8 +214,7 @@ public class AccountsInfoPage extends GenericWrappers{
 
 	@SuppressWarnings("deprecation")
 	public void clickDeleteAccountButton() {
-		driver.findElement(MobileBy.AndroidUIAutomator(
-				"new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\"Delete Account\"));"));
+		scrollToText("Delete Account");
 		clickbyXpath(DeleteAccountButton, " Delete Account click Button ");
 	}
 
@@ -250,6 +263,19 @@ public class AccountsInfoPage extends GenericWrappers{
 			System.out.println("No-popup displayed");
 		}
 	}
+	public void popuphandlewithdevice() {
+		
+		if (accountsdelpop_up_withdevice.isDisplayed()) {
+			clickbyXpath(accountsdelpop_up_withdevice, "Acceptpop_up");
+		}
+		//		else if (accountspop_upcancelbtn.isDisplayed()) {
+		//			clickbyXpath(accountspop_upcancelbtn, "Acceptpop_up");
+		//			
+		//		} 
+		else {
+			System.out.println("No-popup displayed");
+		}
+	}
 
 	public void checkAccountsinfousername_email_Language() throws Exception {
 
@@ -264,7 +290,7 @@ public class AccountsInfoPage extends GenericWrappers{
 		clickbyXpath(SelectLanguageEnglishButton, " Select English Button ");
 		verifyTextContainsByXpath(languagesubtitle,"Select Language" , "Languagesubtitle");
 		clickDeleteAccountButton();
-		popuphandle();
+		popuphandlewithdevice();
 		
 		clickbyXpath(DevicesettingsbackButton, " Device Setting Back Button ");
        
@@ -272,35 +298,22 @@ public class AccountsInfoPage extends GenericWrappers{
 		clickbyXpath(removeDevice, " Click The Remove Device Button ");
 		clickbyXpath(removeDevicePopupYesButton, " Click The Remove Device Pop-up YES Button ");
 		
-//		// Print the page source to check for toast message visibility
-//		System.out.println(driver.getPageSource());
-//
-//		// If the toast message is present in the page source, proceed with verification
-//		if (driver.getPageSource().contains("Device removed successfully")) {
-//		    System.out.println("Toast message is visible: Device removed successfully");
-//		} else {
-//		    System.out.println("Toast message not found");
-//		}
 
 
 
-//		WebElement toast = driver.findElement(By.xpath("//android.widget.Toast[@text='"+device_removed_Toast+"']"));
 		
 		
-//		verifyTextContainsByXpath(toast, device_removed_Toast, "Device removed Toast message");
+		verifyTextContainsByXpath(deviceremovedtoast, device_removed_Toast, "Device removed Toast message");
+		
 		clickbyXpath(menuBarButton, " Menu Bar ");
 		clickbyXpath(AccountsinfoButtonbeforeadddevice, " Accounts Info Button");
 		clickDeleteAccountButton();
 		popuphandle();
+		verifyTextContainsByXpath(accountdeletedtoast, accountdel_Toast, "Account deleted Toast message");
 		
-//	 toast = wait.until(ExpectedConditions.presenceOfElementLocated(
-//			    MobileBy.AndroidUIAutomator("new UiSelector().className(\"android.widget.Toast\")")));
-//		 
-//			
-//			 verifyTextContainsByXpath(toast, accountdel_Toast, "Account delete Toast message");		
-		//android.widget.Toast[@text="Device removed successfully"]
 
-		verifyTextContainsByXpath(signUpButton, "SignUp", "SignUp page");
+
+		verifyTextContainsByXpath(signUpButton, "Sign Up", "SignUp page");
 
 		 clickbyXpath(signUpButton, " Sign Up Button " );
 		 entervaluebyXpath(usernamesignup, " User Name " , userName);
@@ -313,7 +326,7 @@ public class AccountsInfoPage extends GenericWrappers{
 			enterOTPField4("4");
 	
 		 clickbyXpath(submitBtn, "OTPsubmitbutton");
-		 if (isElementDisplayed(addDeviceButton)) {
+		 if (isElementDisplayed(addDeviceButton,"Add device button")) {
 			 System.out.println("SignUp successfull");
 		 }
 

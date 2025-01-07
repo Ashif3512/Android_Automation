@@ -12,24 +12,23 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import io.appium.java_client.MobileBy;
 import io.appium.java_client.TouchAction;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.touch.WaitOptions;
 import io.appium.java_client.touch.offset.PointOption;
 import wrappers.GenericWrappers;
 
 public class DeviceMenuPage extends GenericWrappers{
 
-	private AndroidDriver<AndroidElement> driver;
+	private AndroidDriver driver;
 
 	// Locate all elements on the page
 
 	@FindBy(xpath = "//android.widget.TextView[@text='']")
 	private WebElement deviceSettingsButton;
 
-	@FindBy(xpath = "//android.widget.TextView[@text='Reset Device']")
+	@FindBy(xpath = "//*[@resource-id='DeviceSetting_resetDevice']")
 	private WebElement resetDeviceButtom;
 	
-	@FindBy(xpath = "//android.widget.Button[@resource-id='android:id/button1']")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"YES\"]")
 	private WebElement resetConfirmationYesButton;
 	
 	@FindBy(xpath = "//android.widget.TextView[@text='Start Pairing']")
@@ -60,11 +59,14 @@ public class DeviceMenuPage extends GenericWrappers{
 	private WebElement deviceSettingSubmitButton;
 	
 	
-	@FindBy(xpath ="//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_geyserInfo, com.szephyr:id/menu_text_geyserInfo\"]")
+	@FindBy(xpath ="//*[@resource-id='menu_icon_geyserInfo']")
 	private WebElement szephyr_info_button;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_geyserInfo, com.szephyr:id/menu_text_geyserInfo\"]")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_geyserInfo']")
 	private WebElement ClickSzephyrInfoButton;
+	
+	@FindBy(xpath = "//*[@resource-id='menu_icon_Report']")
+	private WebElement clickReportButton;
 	
 	@FindBy(xpath = "//android.widget.TextView[@text=\"Carrier\"]")
 	private WebElement CheckSzephyrInfPageBrandName;
@@ -78,14 +80,14 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.TextView[@text=\"Medium\"]")
 	private WebElement CheckSzephyrInfPageRoomSize;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/DeviceSetting_energysaving\"]")
+	@FindBy(xpath = "//*[@resource-id='DeviceSetting_energysaving_Icon']")
 	private WebElement ClickESMButton;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/AutoPowerON/OFF_Switch\"]/android.view.ViewGroup/android.view.ViewGroup")
+	@FindBy(xpath = "//*[@resource-id='AutoPowerON/OFF_Switch']")
 	private WebElement EnableToogleSwtich;
 	
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/AutoPowerON/OFF_Switch\"]")
+	@FindBy(xpath = "//*[@resource-id='AutoPowerON/OFF_Switch']")
 	private WebElement DisableToogleSwtich;
 	
 	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[2]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[1]")
@@ -97,7 +99,7 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.ScrollView/android.view.ViewGroup/android.view.ViewGroup[2]/android.view.ViewGroup[1]/com.horcrux.svg.SvgView[1]/com.horcrux.svg.GroupView/com.horcrux.svg.PathView[1]")
 	private WebElement ClickLesscooling;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/DeviceON/OFF_Ok_ButtonText\"]")
+	@FindBy(xpath = "//*[@resource-id='DeviceON/OFF_Ok_Button']")
 	private WebElement EsmOKbutton;
 	
 	@FindBy(xpath = "//android.widget.Toast[@text=\"Connect with device and try again\"]")
@@ -106,23 +108,23 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.Toast[@text=\"Energy saving mode updated successfully\"]")
 	private WebElement SuccessfullyToast;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement ESMPageBackButton;
 
 	@FindBy(xpath = "//*[@resource-id='menu_icon_logout']")
 	private WebElement logoutButton;
 	
-	@FindBy(xpath = "//*[@resource-id='logoutIcon']")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_logout']")
 	private WebElement logoutButtonAfterReset;
 
 	
-	@FindBy(xpath = "//*[@resource-id='Logout_LOGOUT']")
+	@FindBy(xpath = "(//android.widget.TextView[@text=\"Logout\"])[2]")
 	private WebElement logoutConfirmationButton;
 	
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button2\"]")
 	private WebElement ClickCancelBluetooth;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_Cancel\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement ClickCancelWifi;
 	
 	@FindBy(xpath =  "//android.widget.Button[@resource-id=\"android:id/button1\"]")
@@ -131,13 +133,13 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Add Router, Choosing to add a router will add a router to your device.\"]")
 	private WebElement ClickaddrouterButton;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement ClickDeviceSettingback;
 	
-	@FindBy(xpath = "//android.widget.TextView[@text=\"\"]")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_addDevice']")
 	private WebElement clickAddDeviceButton;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/AddDevice_NewDevicePairing_ButtonText\"]")
+	@FindBy(xpath = "//*[@resource-id='AddDevice_NewDevicePairing_ButtonText']")
 	private WebElement clickNewDevicePairingButton;
 	
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"nee_1\"]")
@@ -149,12 +151,11 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"nee_3\"]")
 	private WebElement clickThirdDeviceButton;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/DeviceSetting_highVoltageConfig\"]")
+	@FindBy(xpath = "//*[@resource-id='DeviceSetting_highVoltageConfig']")
 	private WebElement lowvoltageconfiguration;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement DevicesettingsbackButton;
-	// Constructor to initialize the driver and instantiate elements using
 	
 	
 	
@@ -165,25 +166,25 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "//android.widget.TextView[@text=\"Remove router\"]")
 	private WebElement removeRouterButton;
 	
-	@FindBy(xpath = "//android.widget.TextView[@text=\"CANCEL\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement removeRouterCancelButton;
 	
-	@FindBy(xpath = "//android.widget.TextView[@text=\"REMOVE\"]")
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Remove\"]")
 	private WebElement RouterpopupRemoveButton;
 	
-	@FindBy(xpath = "//android.widget.CheckBox[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_CheckBox\"]")
+	@FindBy(xpath = "//android.widget.CheckBox")
 	private WebElement addRouterPopCheckBox;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/Wifi_RouterPasswerd_Cancel_Text\"]")
+	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"Cancel\"]")
 	private WebElement routerPopCancelButton;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/DeviceSetting_LEDQuietMode\"]/android.view.ViewGroup")
+	@FindBy(xpath = "//*[@resource-id='settingDevice_toggle_switch']")
 	private WebElement quietLEDToggleEnable;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/DeviceSetting_LEDQuietMode\"]/android.view.ViewGroup")
+	@FindBy(xpath = "//*[@resource-id='settingDevice_toggle_switch']")
 	private WebElement quietLEDToggleDisable;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/Device_BackIcon\"]")
+	@FindBy(xpath = "//*[@resource-id='Device_BackIcon']")
 	private WebElement deviceSettingsPageBackButton;
 	
 	@FindBy(xpath = "//android.widget.Button[@resource-id=\"android:id/button3\"]")
@@ -198,19 +199,20 @@ public class DeviceMenuPage extends GenericWrappers{
 	@FindBy(xpath = "(//android.widget.TextView[@text=\"\"])[1]")
 	private WebElement hoursPlusButton ;
 	
-	@FindBy(xpath = "//android.widget.TextView[@content-desc=\"com.szephyr:id/UserConfig_Submit_ButtonText\"]")
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Submit_ButtonText']")
 	private WebElement infiniteSubmitButton ;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/DeviceSetting_DurationforON, com.szephyr:id/DeviceSetting_DurationforON_Icon\"]")
+	@FindBy(xpath = "//*[@resource-id='DeviceSetting_DurationforON']")
 	private WebElement durationForON;
 	
-	@FindBy(xpath = "//android.widget.Switch[@content-desc=\"com.szephyr:id/UserConfig_Switch3\"]")
+	@FindBy(xpath = "//*[@resource-id='UserConfig_Switch3']")
 	private WebElement pairingTimeQuietLEDEnable;
 	
-	@FindBy(xpath = "//android.view.ViewGroup[@content-desc=\"com.szephyr:id/menu_icon_removeDevice, com.szephyr:id/menu_text_removeDevice\"]")
+	@FindBy(xpath = "//*[@resource-id='menu_icon_removeDevice']")
 	private WebElement removeDevice;
 	
-	@FindBy(xpath = "//android.widget.TextView[@text=\"NO\"]")
+	
+	@FindBy(xpath = "//android.widget.TextView[@text=\"Cancel\"]")
 	private WebElement removeDevicePopupNoButton;
 	
 	
@@ -234,11 +236,11 @@ public class DeviceMenuPage extends GenericWrappers{
 	}
 
 	public void clickResetDeviceButton() {
-		clickbyXpath(resetDeviceButtom, " Pairing Mode Check Box ");
+		clickbyXpath(resetDeviceButtom, "Reset Button clicked successfully ");
 	}
 	
 	public void clickResetConfirmationYesButton() {	
-		clickbyXpath(resetConfirmationYesButton, " Pairing mode Next Button ");
+		clickbyXpath(resetConfirmationYesButton, "Reset confirmation button clicked successfully");
 	}
 	public void clickszephyr_info_button() {	
 		clickbyXpath(szephyr_info_button, " Szphyr_info_menubar");
@@ -251,11 +253,11 @@ public class DeviceMenuPage extends GenericWrappers{
 	}
 	
 	public void clickLogoutButtonAfterReset() {
-		clickbyXpath(logoutButtonAfterReset, " Logout button ");
+		clickbyXpath(logoutButtonAfterReset, " Logout button");
 	}
 	
 	public void clickLogoutConfirmationButton() {
-		clickbyXpath(logoutConfirmationButton, " Logout button ");
+		clickbyXpath(logoutConfirmationButton, " Logout confirmation button ");
 	}
 	public void ClickSzephyrInfoButton() {	
 		clickbyXpath(ClickSzephyrInfoButton, " Szephyr Info ");
@@ -452,14 +454,14 @@ public class DeviceMenuPage extends GenericWrappers{
 		}	
 		
 		public void shellAllowpopup() {	
-			if (isElementDisplayed(shellallow)) {
+			if (isElementDisplayedCheck(shellallow)) {
 //				expWait(shellallow);
 				clickbyXpath(shellallow, " allow shell ");
 			}
 			
 		}
 		public void shellDenypopup() {
-			if (isElementDisplayed(shelldeny)) {
+			if (isElementDisplayedCheck(shelldeny)) {
 				clickbyXpath(shelldeny, " deny shell ");
 				
 			} 
@@ -485,13 +487,13 @@ public class DeviceMenuPage extends GenericWrappers{
 
 			driver.findElement(MobileBy.AndroidUIAutomator(
 				    "new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text(\"Router Details\"));"));
-			if (isElementDisplayed(addRouterButton)) {
+			if (isElementDisplayed(addRouterButton,"Add router button")) {
 				clickbyXpath(addRouterButton, "Add router button ");
 				enterWiFiPassword("12345678908");
-				clickAddRouterCheckBox();
-				clickbyXpath(enterButton, " Enter Button  ");
+//				clickAddRouterCheckBox();
+				clickbyXpath(submitBtn, " Enter Button  ");
 			}
-			else if (isElementDisplayed(removeRouterButton)) {
+			else if (isElementDisplayed(removeRouterButton,"Remove router  button")) {
 				clickbyXpath(removeRouterButton, "Remove router button ");
 				clickRemoveRouterCancelButton();
 				clickbyXpath(removeRouterButton, "Remove router button ");
@@ -509,7 +511,7 @@ public class DeviceMenuPage extends GenericWrappers{
 		
 		public void AddDevicePagedisplayed() {
 
-			if (isElementDisplayed(addDeviceButton)) {
+			if (isElementDisplayed(addDeviceButton,"Add device button")) {
 				System.out.println("Add device page displayed");
 			}
 		}
